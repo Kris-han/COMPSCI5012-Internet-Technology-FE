@@ -5,7 +5,7 @@
       <el-avatar :size="28">韩</el-avatar>
 
       <div v-if="!collapsed" class="sidebar_title">
-        <div class="sidebar_name">韩晨</div>
+        <div class="sidebar_name">chris</div>
         <div class="sidebar_sub">个人工作区</div>
       </div>
 
