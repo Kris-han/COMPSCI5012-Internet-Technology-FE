@@ -29,6 +29,7 @@
       type="danger"
       plain
       :icon="Plus"
+      @click="$emit('add-task')"
     >
       添加任务
     </el-button>
@@ -59,7 +60,7 @@
 
         <!-- Badge：用一个容器固定在右侧，并且垂直居中 -->
         <span v-if="!collapsed" class="menu_right">
-          <el-badge :value="2" class="sidebar_badge" />
+          <el-badge :value="todayCount" class="sidebar_badge" />
         </span>
       </el-menu-item>
 
@@ -117,12 +118,14 @@ const props = defineProps<{
   activeKey: string
   activeProject?: string
   collapsed?: boolean
+  todayCount?: number
 }>()
 
 const emit = defineEmits<{
   (e: "update:activeKey", v: string): void
   (e: "update:collapsed", v: boolean): void
   (e: "update:activeProject", v: string): void
+  (e: "add-task"): void
 }>()
 
 function onSelect(key: string) {

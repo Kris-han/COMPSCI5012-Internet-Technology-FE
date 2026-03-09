@@ -4,11 +4,14 @@
       v-model:activeKey="activeKey"
       v-model:activeProject="activeProject"
       v-model:collapsed="collapsed"
+      :todayCount="todayCount"
+      @add-task="showAdd = true"
     />
 
     <main class="main">
-      <h2>当前页面：{{ activeKey }}</h2>
-      <!-- 这里根据 activeKey 切换你的右侧内容组件 -->
+      <TodayView v-if="activeKey === 'today'" v-model:showAdd="showAdd" @count-change="todayCount = $event" />
+      <TaskListView v-else-if="activeKey === 'upcoming'" v-model:showAdd="showAdd" />
+      <FinishedView v-else-if="activeKey === 'completed'" />
     </main>
   </div>
 </template>
@@ -16,10 +19,16 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import SidebarMenu from "./SidebarMenu.vue"
+import TodayView from "./TodayView.vue"
+import TaskListView from "./TaskListView.vue"
+import FinishedView from "./FinishedView.vue"
+
 
 const activeKey = ref("today")
 const activeProject = ref("guide")
 const collapsed = ref(false)
+const showAdd = ref(false)
+const todayCount = ref(0)
 </script>
 
 <style scoped>
@@ -31,5 +40,7 @@ const collapsed = ref(false)
 .main {
   flex: 1;
   padding: 16px;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 </style>
