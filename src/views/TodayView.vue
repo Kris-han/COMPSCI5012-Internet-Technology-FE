@@ -21,7 +21,6 @@
       />
     </div>
 
-    <AddTaskDialog v-model:visible="showAdd" @created="loadTasks" />
   </div>
 </template>
 
@@ -31,7 +30,6 @@ import { Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { getTaskList } from '../api/task'
 import TaskItem from '../components/TaskItem.vue'
-import AddTaskDialog from '../components/AddTaskDialog.vue'
 
 const tasks = ref([])
 const loading = ref(false)

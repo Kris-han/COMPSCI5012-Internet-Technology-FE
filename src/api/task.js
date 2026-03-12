@@ -19,3 +19,7 @@ export function deleteTask(id) {
 export function getTaskList(params = {}) {
   return http.get('/task/task_list', { params })
 }
+
+export function getUserList() {
+  return http.get('/user/list')
+}

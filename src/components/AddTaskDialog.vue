@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="visible" title="Add Task" width="50%" @close="resetForm">
+  <el-dialog v-model="visible" title="Add Task" width="50%" :show-close="false" @close="resetForm">
     <el-form :model="form" :rules="rules" ref="formRef" label-width="80px">
       <el-form-item label="Title" prop="title">
         <el-input v-model="form.title" placeholder="Task Title" />
@@ -17,34 +17,47 @@
         </el-select>
       </el-form-item>
 
+      <el-form-item label="Executor">
+        <el-select v-model="form.executor_id" placeholder="Optional" clearable>
+          <el-option v-for="u in userOptions" :key="u.id" :label="u.username" :value="u.id" />
+        </el-select>
+      </el-form-item>
+
       <el-form-item label="Due Date">
         <el-date-picker v-model="form.due_date" type="datetime" placeholder="Optional" />
       </el-form-item>
     </el-form>
 
     <template #footer>
-      <el-button @click="visible = false">Cancel</el-button>
       <el-button type="primary" :loading="loading" @click="submit">Confirm</el-button>
+      <el-button @click="visible = false">Cancel</el-button>
     </template>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { addTask } from '../api/task'
+import { addTask, getUserList } from '../api/task'
 
 const visible = defineModel<boolean>('visible', { default: false })
 const emit = defineEmits<{ (e: 'created'): void }>()
 
 const formRef = ref()
 const loading = ref(false)
+const userOptions = ref([])
 
 const form = reactive({
   title: '',
   description: '',
   priority: 2,
+  executor_id: null,
   due_date: null,
+})
+
+onMounted(async () => {
+  const res = await getUserList()
+  userOptions.value = res.data.data
 })
 
 const rules = {
@@ -75,5 +88,6 @@ async function submit() {
 function resetForm() {
   formRef.value?.resetFields()
   form.due_date = null
+  form.executor_id = null
 }
 </script>

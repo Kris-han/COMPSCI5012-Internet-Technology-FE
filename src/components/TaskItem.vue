@@ -3,6 +3,7 @@
     <div class="task-item__left">
       <el-tag :type="priorityType" size="small">{{ priorityLabel }}</el-tag>
       <span class="task-item__title">{{ task.title }}</span>
+      <span v-if="task.owner" class="task-item__owner">@{{ task.owner }}</span>
       <span v-if="task.description" class="task-item__desc">{{ task.description }}</span>
     </div>
 
@@ -14,7 +15,7 @@
   </div>
 
 <!-- Edit Dialog -->
-  <el-dialog v-model="editVisible" title="Edit Task" width="50%" @close="resetEdit">
+  <el-dialog v-model="editVisible" title="Edit Task" width="50%" :show-close="false" @close="resetEdit">
     <el-form :model="editForm" :rules="rules" ref="editFormRef" label-width="80px">
       <el-form-item label="Title" prop="title">
         <el-input v-model="editForm.title" />
@@ -29,6 +30,12 @@
           <el-option label="Low" :value="1" />
           <el-option label="Medium" :value="2" />
           <el-option label="High" :value="3" />
+        </el-select>
+      </el-form-item>
+
+      <el-form-item label="Executor">
+        <el-select v-model="editForm.executor_id" placeholder="Optional" clearable>
+          <el-option v-for="u in userOptions" :key="u.id" :label="u.username" :value="u.id" />
         </el-select>
       </el-form-item>
 
@@ -47,17 +54,17 @@
     </el-form>
 
     <template #footer>
-      <el-button @click="editVisible = false">Cancel</el-button>
       <el-button type="primary" :loading="loading" @click="submitEdit">Save</el-button>
+      <el-button @click="editVisible = false">Cancel</el-button>
     </template>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { Edit, Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { updateTask, deleteTask } from '../api/task'
+import { updateTask, deleteTask, getUserList } from '../api/task'
 
 const props = defineProps<{ task: any }>()
 const emit = defineEmits<{
@@ -90,13 +97,20 @@ async function onDelete() {
 const editVisible = ref(false)
 const loading = ref(false)
 const editFormRef = ref()
+const userOptions = ref([])
 
 const editForm = reactive({
   title: '',
   description: '',
   priority: 2,
+  executor_id: null as number | null,
   status: 1,
   due_date: null as string | null,
+})
+
+onMounted(async () => {
+  const res = await getUserList()
+  userOptions.value = res.data.data
 })
 
 const rules = {
@@ -107,6 +121,7 @@ function onEdit() {
   editForm.title = props.task.title
   editForm.description = props.task.description ?? ''
   editForm.priority = props.task.priority
+  editForm.executor_id = props.task.executor_id ?? null
   editForm.status = props.task.status
   editForm.due_date = props.task.due_date ?? null
   editVisible.value = true
@@ -158,6 +173,11 @@ function resetEdit() {
 .task-item__title {
   font-size: 14px;
   font-weight: 500;
+}
+
+.task-item__owner {
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
 }
 
 .task-item__desc {
