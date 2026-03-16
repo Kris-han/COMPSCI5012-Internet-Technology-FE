@@ -1,30 +1,124 @@
 <script setup>
+import { ref, computed, onMounted } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
+import { fetchDashboardData } from '@/api/dashboard'
 
-const timeStats = [
-  { label: '24 hours', value: 1, color: '#EF4444' },
-  { label: '7 days', value: 2, color: '#F97316' },
-  { label: '14 days', value: 3, color: '#EAB308' },
-  { label: 'month', value: 4, color: '#22C55E' },
-]
+const loading = ref(false)
 
-const statusStats = [
-  { label: 'Completed', color: '#2563EB' },
-  { label: 'In Progress', color: '#60A5FA' },
-  { label: 'To Do', color: '#93C5FD' },
-  { label: 'Postponed', color: '#DBEAFE' },
-]
+const dashboardData = ref({
+  summary: {
+    total_tasks: 0,
+    completed: 0,
+    in_progress: 0,
+    postponed: 0,
+  },
+  due_stats: {
+    within_24_hours: 0,
+    within_7_days: 0,
+    within_14_days: 0,
+    within_month: 0,
+  },
+  status_stats: {
+    completed: 0,
+    in_progress: 0,
+    todo: 0,
+    postponed: 0,
+  },
+  recent_summary: {
+    completed_last_24_hours: 0,
+    in_progress_now: 0,
+    postponed_this_week: 0,
+  },
+})
 
-const summaryCards = [
-  { label: 'Total Tasks', value: 10 },
-  { label: 'Completed', value: 3 },
-  { label: 'In Progress', value: 2 },
-  { label: 'Postponed', value: 1 },
-]
+const summaryCards = computed(() => [
+  { label: 'Total Tasks', value: dashboardData.value.summary.total_tasks },
+  { label: 'Completed', value: dashboardData.value.summary.completed },
+  { label: 'In Progress', value: dashboardData.value.summary.in_progress },
+  { label: 'Postponed', value: dashboardData.value.summary.postponed },
+])
+
+const timeStats = computed(() => [
+  { label: '24 hours', value: dashboardData.value.due_stats.within_24_hours, color: '#EF4444' },
+  { label: '7 days', value: dashboardData.value.due_stats.within_7_days, color: '#F97316' },
+  { label: '14 days', value: dashboardData.value.due_stats.within_14_days, color: '#EAB308' },
+  { label: 'month', value: dashboardData.value.due_stats.within_month, color: '#22C55E' },
+])
+
+const statusStats = computed(() => [
+  { label: 'Completed', value: dashboardData.value.status_stats.completed, color: '#2563EB' },
+  { label: 'In Progress', value: dashboardData.value.status_stats.in_progress, color: '#60A5FA' },
+  { label: 'To Do', value: dashboardData.value.status_stats.todo, color: '#93C5FD' },
+  { label: 'Postponed', value: dashboardData.value.status_stats.postponed, color: '#DBEAFE' },
+])
+
+const recentSummaryList = computed(() => [
+  `${dashboardData.value.recent_summary.completed_last_24_hours} tasks were completed in the last 24 hours.`,
+  `${dashboardData.value.recent_summary.in_progress_now} tasks are currently in progress.`,
+  `${dashboardData.value.recent_summary.postponed_this_week} postponed task may need follow-up this week.`,
+])
+
+const maxTimeValue = computed(() => {
+  const values = timeStats.value.map(item => item.value)
+  return Math.max(...values, 1)
+})
+
+const getBarWidth = (value) => {
+  return `${(value / maxTimeValue.value) * 100}%`
+}
+
+const donutStyle = computed(() => {
+  const stats = statusStats.value
+  const total = stats.reduce((sum, item) => sum + item.value, 0)
+
+  if (!total) {
+    return {
+      background: 'conic-gradient(#E5E7EB 0% 100%)',
+    }
+  }
+
+  let currentPercent = 0
+  const parts = stats.map(item => {
+    const start = currentPercent
+    const end = currentPercent + (item.value / total) * 100
+    currentPercent = end
+    return `${item.color} ${start}% ${end}%`
+  })
+
+  return {
+    background: `conic-gradient(${parts.join(', ')})`,
+  }
+})
+
+const loadDashboardData = async () => {
+  loading.value = true
+  try {
+    const res = await fetchDashboardData(1001)
+
+    // 你的 http 封装如果直接返回后端数据
+    if (res.code === 200) {
+      dashboardData.value = res.data
+      return
+    }
+
+    // 你的 http 封装如果返回 axios 原始响应
+    if (res.data && res.data.code === 200) {
+      dashboardData.value = res.data.data
+    }
+  } catch (error) {
+    console.error('Failed to fetch dashboard data:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  loadDashboardData()
+})
 </script>
 
 <template>
-  <div class="dashboard-page">
+  <div class="dashboard-page" v-loading="loading">
     <div class="dashboard-topbar">
       <el-button type="primary" class="add-task-btn" :icon="Plus">
         Add New Task
@@ -32,7 +126,6 @@ const summaryCards = [
     </div>
 
     <div class="dashboard-main">
-      <!-- 顶部统计卡片 -->
       <section class="summary-row">
         <div
           v-for="item in summaryCards"
@@ -44,7 +137,6 @@ const summaryCards = [
         </div>
       </section>
 
-      <!-- task count -->
       <section class="chart-panel">
         <div class="panel-title">Task Count</div>
 
@@ -58,12 +150,12 @@ const summaryCards = [
 
             <div class="bar-track">
               <div
-                  class="bar-fill"
-                  :style="{
-                    width: `${item.value * 25}%`,
-                    background: item.color
-                  }"
-                ></div>
+                class="bar-fill"
+                :style="{
+                  width: getBarWidth(item.value),
+                  background: item.color
+                }"
+              ></div>
             </div>
 
             <div class="bar-value">{{ item.value }}</div>
@@ -73,12 +165,11 @@ const summaryCards = [
         <div class="chart-caption">task count</div>
       </section>
 
-      <!-- task overview -->
       <section class="overview-panel">
         <div class="panel-title">Task Overview</div>
 
         <div class="donut-wrap">
-          <div class="donut-chart"></div>
+          <div class="donut-chart" :style="donutStyle"></div>
 
           <div class="donut-legend">
             <div
@@ -86,7 +177,7 @@ const summaryCards = [
               :key="item.label"
               class="legend-item"
             >
-              <span class="legend-text">{{ item.label }}</span>
+              <span class="legend-text">{{ item.label }} ({{ item.value }})</span>
               <span
                 class="legend-color"
                 :style="{ background: item.color }"
@@ -98,13 +189,12 @@ const summaryCards = [
         <div class="overview-caption">task overview</div>
       </section>
 
-      <!-- 底部说明 -->
       <section class="notes-panel">
         <div class="panel-title">Recent Summary</div>
         <ul class="notes-list">
-          <li>2 tasks were completed in the last 24 hours.</li>
-          <li>3 tasks are currently in progress.</li>
-          <li>1 postponed task may need follow-up this week.</li>
+          <li v-for="(item, index) in recentSummaryList" :key="index">
+            {{ item }}
+          </li>
         </ul>
       </section>
     </div>
@@ -151,6 +241,7 @@ const summaryCards = [
   border: 1px solid #dcdfe6;
   background: #fafafa;
   padding: 16px 18px;
+  border-radius: 12px;
 }
 
 .summary-card__label {
@@ -212,10 +303,13 @@ const summaryCards = [
     linear-gradient(to right, transparent 74.5%, #D1D5DB 75%, transparent 75.5%),
     #F8FAFC;
   position: relative;
+  overflow: hidden;
+  border-radius: 8px;
 }
 
 .bar-fill {
   height: 100%;
+  transition: width 0.3s ease;
 }
 
 .bar-value {
@@ -243,13 +337,8 @@ const summaryCards = [
   width: 180px;
   height: 180px;
   border-radius: 50%;
-  background: conic-gradient(
-    #2563EB 0% 25%,
-    #60A5FA 25% 55%,
-    #93C5FD 55% 75%,
-    #DBEAFE 75% 100%
-  );
   position: relative;
+  flex-shrink: 0;
 }
 
 .donut-chart::after {
@@ -282,6 +371,7 @@ const summaryCards = [
   height: 12px;
   border-radius: 2px;
   display: inline-block;
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .overview-caption {
@@ -297,6 +387,7 @@ const summaryCards = [
   border: 1px solid #dcdfe6;
   background: #fafafa;
   padding: 20px;
+  border-radius: 12px;
 }
 
 .notes-list {
@@ -333,6 +424,15 @@ const summaryCards = [
 @media (max-width: 640px) {
   .summary-row {
     grid-template-columns: 1fr;
+  }
+
+  .bar-row {
+    grid-template-columns: 80px 1fr 24px;
+    gap: 8px;
+  }
+
+  .bar-label {
+    font-size: 14px;
   }
 }
 </style>
