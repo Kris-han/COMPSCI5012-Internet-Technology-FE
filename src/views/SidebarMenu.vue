@@ -137,7 +137,9 @@ function onSelectProject(key: string) {
 <style scoped>
 /* Layout */
 .sidebar {
-  height: 100%;
+  width: 280px;
+  min-width: 280px;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   padding: 12px;
@@ -148,6 +150,7 @@ function onSelectProject(key: string) {
 
 .sidebar.is-collapsed {
   width: 64px;
+  min-width: 64px;
   padding: 12px 10px;
 }
 

@@ -1,3 +1,13 @@
+<script setup>
+import { ref } from 'vue'
+import SidebarMenu from './SidebarMenu.vue'
+import MainContent from './MainContent.vue'
+
+const activeKey = ref('today')
+const activeProject = ref('guide')
+const collapsed = ref(false)
+</script>
+
 <template>
   <div class="home">
     <SidebarMenu
@@ -7,29 +17,24 @@
     />
 
     <main class="main">
-      <h2>当前页面：{{ activeKey }}</h2>
-      <!-- 这里根据 activeKey 切换你的右侧内容组件 -->
+      <MainContent
+        :active-key="activeKey"
+        :active-project="activeProject"
+      />
     </main>
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref } from "vue"
-import SidebarMenu from "./SidebarMenu.vue"
-
-const activeKey = ref("today")
-const activeProject = ref("guide")
-const collapsed = ref(false)
-</script>
-
 <style scoped>
 .home {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
+  background: #f7f8fa;
 }
 
 .main {
   flex: 1;
-  padding: 16px;
+  min-width: 0;
+  overflow: auto;
 }
 </style>
