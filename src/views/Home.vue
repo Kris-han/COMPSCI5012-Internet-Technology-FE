@@ -1,3 +1,22 @@
+<script setup>
+import { ref } from 'vue'
+import SidebarMenu from './SidebarMenu.vue'
+import MainContent from './MainContent.vue'
+import AddTaskDialog from '../../src/components/AddTaskDialog.vue'
+
+const activeKey = ref('dashboard')
+const activeProject = ref('guide')
+const collapsed = ref(false)
+
+const showAdd = ref(false)
+const todayCount = ref(0)
+
+const onTaskCreated = () => {
+  showAdd.value = false
+  // 后面这里可以加刷新逻辑
+}
+</script>
+
 <template>
   <div class="home">
     <SidebarMenu
@@ -9,46 +28,31 @@
     />
 
     <main class="main">
-      <TodayView v-if="activeKey === 'today'" v-model:showAdd="showAdd" @count-change="todayCount = $event" />
-      <TaskListView v-else-if="activeKey === 'upcoming'" :key="taskListKey" v-model:showAdd="showAdd" />
-      <FinishedView v-else-if="activeKey === 'completed'" />
+      <MainContent
+        :active-key="activeKey"
+        :active-project="activeProject"
+      />
     </main>
 
-    <AddTaskDialog v-model:visible="showAdd" @created="onTaskCreated" />
+    <AddTaskDialog
+      v-model:visible="showAdd"
+      @created="onTaskCreated"
+    />
   </div>
 </template>
-
-<script setup lang="ts">
-import { ref } from "vue"
-import SidebarMenu from "./SidebarMenu.vue"
-import TodayView from "./TodayView.vue"
-import TaskListView from "./TaskListView.vue"
-import FinishedView from "./FinishedView.vue"
-import AddTaskDialog from "../components/AddTaskDialog.vue"
-
-const activeKey = ref("today")
-const activeProject = ref("guide")
-const collapsed = ref(false)
-const showAdd = ref(false)
-const todayCount = ref(0)
-const taskListKey = ref(0)
-
-function onTaskCreated() {
-  taskListKey.value++
-  activeKey.value = 'upcoming'
-}
-</script>
 
 <style scoped>
 .home {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
+  width: 100%;
+  background: #f5f7fb;
 }
 
 .main {
   flex: 1;
-  padding: 16px;
-  overflow: hidden;
-  box-sizing: border-box;
+  min-width: 0;
+  min-height: 100vh;
+  overflow: auto;
 }
 </style>

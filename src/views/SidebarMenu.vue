@@ -49,7 +49,7 @@
       :default-active="activeKey"
       @select="onSelect"
     >
-      <el-menu-item index="inbox">
+      <el-menu-item index="dashboard">
         <el-icon><Message /></el-icon>
         <span v-if="!collapsed" class="menu_text">Dashboard</span>
       </el-menu-item>
@@ -64,12 +64,12 @@
         </span>
       </el-menu-item>
 
-      <el-menu-item index="upcoming">
+      <el-menu-item index="taskList">
         <el-icon><Clock /></el-icon>
         <span v-if="!collapsed" class="menu_text">TaskList</span>
       </el-menu-item>
 
-      <el-menu-item index="completed">
+      <el-menu-item index="finished">
         <el-icon><CircleCheck /></el-icon>
         <span v-if="!collapsed" class="menu_text">Finished</span>
       </el-menu-item>
@@ -140,7 +140,9 @@ function onSelectProject(key: string) {
 <style scoped>
 /* Layout */
 .sidebar {
-  height: 100%;
+  width: 280px;
+  min-width: 280px;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   padding: 12px;
@@ -151,6 +153,7 @@ function onSelectProject(key: string) {
 
 .sidebar.is-collapsed {
   width: 64px;
+  min-width: 64px;
   padding: 12px 10px;
 }
 
