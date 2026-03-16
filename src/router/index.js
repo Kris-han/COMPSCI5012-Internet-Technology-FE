@@ -1,25 +1,28 @@
 import { createRouter, createWebHistory } from 'vue-router'
-
-
-import Home from '../views/Home.vue'
-import About from '../views/About.vue'
+import Login from '@/views/Login.vue'
+import Register from '@/views/Register.vue'
+import Dashboard from '@/views/Dashboard.vue'
 
 const routes = [
-  {
-    path: '/',
-    name: 'Home',
-    component: Home
-  },
-  {
-    path: '/about',
-    name: 'About',
-    component: About
-  }
+  { path: '/login', name: 'Login', component: Login },
+  { path: '/register', name: 'Register', component: Register },
+  { path: '/dashboard', name: 'Dashboard', component: Dashboard, meta: { requiresAuth: true } },
+  { path: '/', redirect: '/login' }
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+// 路由守卫：检查认证状态
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('access_token')
+  if (to.meta.requiresAuth && !token) {
+    next('/login')
+  } else {
+    next()
+  }
 })
 
 export default router

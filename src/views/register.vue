@@ -1,277 +1,175 @@
 <template>
-  <div class="auth-container">
-    <h2 class="text-center mb-4 fw-bold">Create Your Account</h2>
-    
-    <!-- 消息提示组件 -->
-    <Alert 
-      :type="alertType" 
-      :message="alertMessage" 
-      :show="showAlert"
-      @close="showAlert = false"
-    />
-
-    <form @submit.prevent="handleRegister" enctype="multipart/form-data">
-      <!-- 用户名 -->
-      <div class="form-group">
-        <label for="username" class="form-label fw-medium">Username</label>
-        <div class="input-group">
-          <span class="input-group-text">
-            <i class="bi bi-person-fill"></i>
-          </span>
-          <input
-            type="text"
-            class="form-control"
-            id="username"
-            v-model="userData.username"
-            placeholder="Enter your username"
-            required
-            @blur="validateField('username')"
+  <el-container class="register-container">
+    <el-card class="register-card">
+      <template #header>
+        <h2>Register</h2>
+      </template>
+      <el-form :model="form" :rules="rules" ref="formRef" label-width="80px">
+        <el-form-item label="Username" prop="username">
+          <el-input v-model="form.username" placeholder="Username"></el-input>
+        </el-form-item>
+        <el-form-item label="Email" prop="email">
+          <el-input v-model="form.email" placeholder="Email"></el-input>
+        </el-form-item>
+        <el-form-item label="Phone" prop="phone_number">
+          <el-input v-model="form.phone_number" placeholder="Phone (optional)"></el-input>
+        </el-form-item>
+        <el-form-item label="Nickname" prop="nickname">
+          <el-input v-model="form.nickname" placeholder="Nickname (optional)"></el-input>
+        </el-form-item>
+        <el-form-item label="Password" prop="password">
+          <el-input v-model="form.password" type="password" placeholder="Password"></el-input>
+        </el-form-item>
+        <el-form-item label="Confirm" prop="password2">
+          <el-input v-model="form.password2" type="password" placeholder="Confirm password"></el-input>
+        </el-form-item>
+        <el-form-item label="Gender" prop="gender">
+          <el-radio-group v-model="form.gender">
+            <el-radio :label="0">Secret</el-radio>
+            <el-radio :label="1">Male</el-radio>
+            <el-radio :label="2">Female</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="Avatar" prop="avatar">
+          <el-upload
+            class="avatar-uploader"
+            action="#"
+            :auto-upload="false"
+            :on-change="handleAvatarChange"
+            :show-file-list="false"
           >
-        </div>
-        <div v-if="errors.username" class="text-danger">{{ errors.username }}</div>
-      </div>
-
-      <!-- 邮箱 -->
-      <div class="form-group">
-        <label for="email" class="form-label fw-medium">Email</label>
-        <div class="input-group">
-          <span class="input-group-text">
-            <i class="bi bi-envelope-fill"></i>
-          </span>
-          <input
-            type="email"
-            class="form-control"
-            id="email"
-            v-model="userData.email"
-            placeholder="Enter your email"
-            required
-            @blur="validateField('email')"
-          >
-        </div>
-        <div v-if="errors.email" class="text-danger">{{ errors.email }}</div>
-      </div>
-
-      <!-- 昵称 -->
-      <div class="form-group">
-        <label for="nickname" class="form-label fw-medium">Nickname (Optional)</label>
-        <div class="input-group">
-          <span class="input-group-text">
-            <i class="bi bi-emoji-smile-fill"></i>
-          </span>
-          <input
-            type="text"
-            class="form-control"
-            id="nickname"
-            v-model="userData.nickname"
-            placeholder="Enter your nickname"
-          >
-        </div>
-      </div>
-
-      <!-- 密码 -->
-      <div class="form-group">
-        <label for="password1" class="form-label fw-medium">Password</label>
-        <div class="input-group">
-          <span class="input-group-text">
-            <i class="bi bi-lock-fill"></i>
-          </span>
-          <input
-            type="password"
-            class="form-control"
-            id="password1"
-            v-model="userData.password1"
-            placeholder="Enter your password"
-            required
-            @blur="validateField('password1')"
-          >
-        </div>
-        <div class="form-text text-muted">
-          Must be at least 8 characters, no common sequences.
-        </div>
-        <div v-if="errors.password1" class="text-danger">{{ errors.password1 }}</div>
-      </div>
-
-      <!-- 确认密码 -->
-      <div class="form-group">
-        <label for="password2" class="form-label fw-medium">Confirm Password</label>
-        <div class="input-group">
-          <span class="input-group-text">
-            <i class="bi bi-lock-real-fill"></i>
-          </span>
-          <input
-            type="password"
-            class="form-control"
-            id="password2"
-            v-model="userData.password2"
-            placeholder="Confirm your password"
-            required
-            @blur="validateField('password2')"
-          >
-        </div>
-        <div v-if="errors.password2" class="text-danger">{{ errors.password2 }}</div>
-      </div>
-
-      <!-- 头像上传（可选） -->
-      <div class="form-group">
-        <label for="avatar" class="form-label fw-medium">Avatar (Optional)</label>
-        <input
-          type="file"
-          class="form-control"
-          id="avatar"
-          accept="image/*"
-          @change="handleAvatarUpload"
-        >
-        <div v-if="errors.avatar" class="text-danger">{{ errors.avatar }}</div>
-      </div>
-
-      <!-- 注册按钮 -->
-      <button type="submit" class="btn btn-primary w-100" :disabled="isLoading">
-        <span v-if="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-        Register
-      </button>
-    </form>
-
-    <!-- 已有账号？跳登录 -->
-    <div class="text-center mt-4">
-      <p class="text-muted">Already have an account? 
-        <router-link to="/login" class="text-primary fw-medium">Login here</router-link>
-      </p>
-    </div>
-  </div>
+            <img v-if="form.avatar" :src="avatarPreview" class="avatar" />
+            <el-icon v-else><Plus /></el-icon>
+          </el-upload>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="handleRegister" :loading="loading">Register</el-button>
+          <el-button @click="$router.push('/login')">Back to Login</el-button>
+        </el-form-item>
+      </el-form>
+    </el-card>
+  </el-container>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { authAPI } from '../../assets/js/api'
-import Alert from '../common/Alert.vue'
+import { ElMessage } from 'element-plus'
+import { Plus } from '@element-plus/icons-vue'
+import axios from '@/utils/axios'
 
 const router = useRouter()
+const formRef = ref(null)
+const loading = ref(false)
+const avatarFile = ref(null)
 
-// 表单数据
-const userData = ref({
+const form = reactive({
   username: '',
   email: '',
+  phone_number: '',
   nickname: '',
-  password1: '',
+  password: '',
   password2: '',
-  avatar: null // 存储头像文件
+  gender: 0,
+  avatar: null
 })
 
-// 状态管理
-const isLoading = ref(false)
-const showAlert = ref(false)
-const alertType = ref('success')
-const alertMessage = ref('')
-const errors = ref({})
+const avatarPreview = computed(() => {
+  return form.avatar ? URL.createObjectURL(form.avatar) : ''
+})
 
-// 头像上传处理
-const handleAvatarUpload = (e) => {
-  const file = e.target.files[0]
-  if (file) {
-    // 验证文件大小（最大 5MB）
-    if (file.size > 5 * 1024 * 1024) {
-      errors.value.avatar = 'Avatar size cannot exceed 5MB'
-      userData.value.avatar = null
-    } else {
-      errors.value.avatar = ''
-      userData.value.avatar = file
+const handleAvatarChange = (file) => {
+  form.avatar = file.raw
+  avatarFile.value = file.raw
+}
+
+const rules = {
+  username: [{ required: true, message: 'Please input username', trigger: 'blur' }],
+  email: [
+    { required: true, message: 'Please input email', trigger: 'blur' },
+    { type: 'email', message: 'Invalid email format', trigger: 'blur' }
+  ],
+  phone_number: [
+    { pattern: /^1[3-9]\d{9}$/, message: 'Invalid phone number', trigger: 'blur' }
+  ],
+  password: [
+    { required: true, message: 'Please input password', trigger: 'blur' },
+    { min: 6, message: 'Password must be at least 6 characters', trigger: 'blur' }
+  ],
+  password2: [
+    { required: true, message: 'Please confirm password', trigger: 'blur' },
+    {
+      validator: (rule, value, callback) => {
+        if (value !== form.password) {
+          callback(new Error('Passwords do not match'))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'blur'
     }
-  }
+  ]
 }
 
-// 表单字段验证
-const validateField = (field) => {
-  switch (field) {
-    case 'username':
-      if (!userData.value.username.trim()) {
-        errors.value.username = 'Username is required'
-      } else if (userData.value.username.length < 3) {
-        errors.value.username = 'Username must be at least 3 characters'
-      } else {
-        errors.value.username = ''
+const handleRegister = () => {
+  formRef.value.validate(async (valid) => {
+    if (!valid) return
+    loading.value = true
+    const formData = new FormData()
+    Object.keys(form).forEach(key => {
+      if (key === 'avatar' && form.avatar) {
+        formData.append('avatar', form.avatar)
+      } else if (form[key] !== null && form[key] !== '') {
+        formData.append(key, form[key])
       }
-      break
-    case 'email':
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      if (!userData.value.email.trim()) {
-        errors.value.email = 'Email is required'
-      } else if (!emailRegex.test(userData.value.email)) {
-        errors.value.email = 'Please enter a valid email'
-      } else {
-        errors.value.email = ''
+    })
+    try {
+      const res = await axios.post('register/', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+      ElMessage.success('Registration successful, please login')
+      router.push('/login')
+    } catch (error) {
+      const errors = error.response?.data
+      let msg = 'Registration failed'
+      if (errors) {
+        msg = Object.values(errors).flat().join('; ')
       }
-      break
-    case 'password1':
-      if (!userData.value.password1) {
-        errors.value.password1 = 'Password is required'
-      } else if (userData.value.password1.length < 8) {
-        errors.value.password1 = 'Password must be at least 8 characters'
-      } else {
-        errors.value.password1 = ''
-      }
-      break
-    case 'password2':
-      if (!userData.value.password2) {
-        errors.value.password2 = 'Please confirm your password'
-      } else if (userData.value.password2 !== userData.value.password1) {
-        errors.value.password2 = 'Passwords do not match'
-      } else {
-        errors.value.password2 = ''
-      }
-      break
-  }
-}
-
-// 注册逻辑
-const handleRegister = async () => {
-  // 前端全字段验证
-  Object.keys(userData.value).forEach(field => {
-    if (field !== 'nickname' && field !== 'avatar') {
-      validateField(field)
+      ElMessage.error(msg)
+    } finally {
+      loading.value = false
     }
   })
-  if (Object.keys(errors.value).length > 0) return
-
-  try {
-    isLoading.value = true
-    // 构建 FormData（支持文件上传）
-    const formData = new FormData()
-    formData.append('username', userData.value.username)
-    formData.append('email', userData.value.email)
-    formData.append('nickname', userData.value.nickname || '')
-    formData.append('password1', userData.value.password1)
-    formData.append('password2', userData.value.password2)
-    if (userData.value.avatar) {
-      formData.append('avatar', userData.value.avatar)
-    }
-
-    // 调用后端注册接口
-    const response = await authAPI.register(formData)
-    const { token, user } = response.data
-
-    // 存储 Token 并跳转登录页
-    localStorage.setItem('token', token)
-    showAlert.value = true
-    alertType.value = 'success'
-    alertMessage.value = `Registration successful! Welcome, ${user.username}!`
-
-    setTimeout(() => {
-      router.push('/login')
-    }, 2000)
-  } catch (error) {
-    // 错误处理（后端返回的字段错误）
-    isLoading.value = false
-    showAlert.value = true
-    alertType.value = 'error'
-    
-    if (error.response?.data?.errors) {
-      // 后端返回的字段级错误
-      errors.value = error.response.data.errors
-      alertMessage.value = 'Registration failed. Please check the form.'
-    } else {
-      alertMessage.value = error.response?.data?.message || 'Registration failed. Please try again.'
-    }
-  }
 }
 </script>
+
+<style scoped>
+.register-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f5f7fa;
+}
+.register-card {
+  width: 500px;
+}
+.avatar-uploader {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.avatar-uploader:hover {
+  border-color: #409eff;
+}
+.avatar {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+}
+</style>

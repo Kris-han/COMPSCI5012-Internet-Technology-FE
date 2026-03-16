@@ -1,19 +1,33 @@
 import axios from 'axios'
 
-// 建议：Vite 用 import.meta.env 读取环境变量
-const http = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
-  timeout: 10000,
-  withCredentials: false, // 如果你后端用 cookie/session 再改 true
+// 创建 axios 实例
+const api = axios.create({
+  baseURL: '/api', // 对应 Vite 代理配置
+  headers: {
+    'Content-Type': 'application/json'
+  }
 })
 
-// 可选：统一拦截器（请求/响应/错误）
-http.interceptors.response.use(
-  (res) => res,
-  (err) => {
-    // 这里不要直接 alert，交给页面处理更灵活
-    return Promise.reject(err)
-  }
+// 请求拦截器：添加认证 Token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  (error) => Promise.reject(error)
 )
 
-export default http
+// 认证相关 API
+export const authAPI = {
+  // 注册
+  register: (userData) => api.post('/accounts/register/', userData),
+  // 登录
+  login: (credentials) => api.post('/accounts/login/', credentials),
+  // 登出（前端仅清除 Token，后端可扩展）
+  logout: () => localStorage.removeItem('token')
+}
+
+export default api
