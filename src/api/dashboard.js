@@ -7,3 +7,7 @@ export function fetchDashboardData(uid) {
     },
   })
 }
+
+export function fetchTodayCount(data = {}) {
+  return http.post('/dashboard/today_count', data)
+}

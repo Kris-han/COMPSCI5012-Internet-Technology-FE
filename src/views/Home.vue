@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import SidebarMenu from './SidebarMenu.vue'
 import MainContent from './MainContent.vue'
+import { fetchTodayCount } from '@/api/dashboard'
 import AddTaskDialog from '../../src/components/AddTaskDialog.vue'
 
 const activeKey = ref('dashboard')
@@ -12,21 +13,47 @@ const showAdd = ref(false)
 const todayCount = ref(0)
 const searchKeyword = ref('')
 const todayRefreshKey = ref(0)
+function getTodayTimeRange() {
+  const now = new Date()
+
+  const start = new Date(now)
+  start.setHours(0, 0, 0, 0)
+
+  const end = new Date(now)
+  end.setHours(23, 59, 59, 999)
+
+  return {
+    start_time_ts: Math.floor(start.getTime() / 1000),
+    end_time_ts: Math.floor(end.getTime() / 1000),
+  }
+}
+
+async function loadTodayCount() {
+  try {
+    const res = await fetchTodayCount({"uid":1001})
+    todayCount.value = Number(res?.data?.data?.today_count || 0)
+  } catch (error) {
+    console.error('loadTodayCount error:', error)
+    todayCount.value = 0
+  }
+}
 
 
 const currentTask = ref(null)
 const showTaskDialog = ref(false)
 const dialogMode = ref('add')
 
-function handleTaskUpdated() {
+const handleTaskUpdated = async () => {
   showTaskDialog.value = false
   currentTask.value = null
   todayRefreshKey.value += 1
+  await loadTodayCount()
 }
 
-const onTaskCreated = () => {
+const onTaskCreated = async () => {
   showAdd.value = false
-  // 后面这里可以加刷新逻辑
+  todayRefreshKey.value += 1
+  await loadTodayCount()
 }
 function handleSearch(value: string) {
   searchKeyword.value = value
@@ -36,6 +63,9 @@ function handleOpenTaskDetail(task) {
   dialogMode.value = 'edit'
   showTaskDialog.value = true
 }
+onMounted(() => {
+  loadTodayCount()
+})
 </script>
 
 <template>
