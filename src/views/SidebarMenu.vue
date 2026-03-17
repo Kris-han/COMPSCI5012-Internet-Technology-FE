@@ -79,7 +79,9 @@
 
     <!-- Footer -->
     <div v-if="!collapsed" class="sidebar_footer">
-      <el-button text :icon="SwitchButton">log out</el-button>
+      <el-button text :icon="SwitchButton" @click="handleLogoutClick">
+        Log out
+      </el-button>
     </div>
   </aside>
 </template>
@@ -114,6 +116,7 @@ const emit = defineEmits<{
   (e: "update:activeProject", v: string): void
   (e: "update:searchKeyword", v: string): void
   (e: "add-task"): void
+  (e: "logout"): void
 }>()
 
 function handleSidebarSearch(value: string) {
@@ -122,6 +125,9 @@ function handleSidebarSearch(value: string) {
 
 function onSelect(key: string) {
   emit("update:activeKey", key)
+}
+function handleLogoutClick() {
+  emit("logout")
 }
 
 function onSelectProject(key: string) {

@@ -109,7 +109,6 @@ async function loadTaskList() {
   loading.value = true
   try {
     const res = await fetchTaskList({
-      uid: 1001, // 后面改成从登录态获取
       page: currentPage.value,
       page_size: pageSize.value,
       keyword: (props.searchKeyword || '').trim(),

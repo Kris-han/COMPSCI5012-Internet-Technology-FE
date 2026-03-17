@@ -1,9 +1,15 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { fetchDashboardData } from '@/api/dashboard'
 
 const loading = ref(false)
+const props = defineProps({
+  dashboardRefreshKey: {
+    type: Number,
+    default: 0,
+  },
+})
 const emit = defineEmits(['add-task'])
 const dashboardData = ref({
   summary: {
@@ -93,9 +99,7 @@ const donutStyle = computed(() => {
 const loadDashboardData = async () => {
   loading.value = true
   try {
-    const res = await fetchDashboardData(1001)
-
-    // 你的 http 封装如果直接返回后端数据
+    const res = await fetchDashboardData()
     if (res.code === 200) {
       dashboardData.value = res.data
       return
@@ -111,7 +115,12 @@ const loadDashboardData = async () => {
     loading.value = false
   }
 }
-
+watch(
+  () => props.dashboardRefreshKey,
+  () => {
+    loadDashboardData()
+  }
+)
 onMounted(() => {
   loadDashboardData()
 })

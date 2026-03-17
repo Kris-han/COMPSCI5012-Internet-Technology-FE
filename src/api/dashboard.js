@@ -1,11 +1,8 @@
 import http from './http'
 
-export function fetchDashboardData(uid) {
+export function fetchDashboardData() {
   return http.get('/dashboard/dashboard_list', {
-    params: {
-      uid,
-    },
-  })
+    params: {},})
 }
 
 export function fetchTodayCount(data = {}) {

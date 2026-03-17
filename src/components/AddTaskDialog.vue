@@ -143,7 +143,6 @@ async function handleConfirm() {
     submitting.value = true
     try {
       const payload = {
-        uid: 1001, // 后面改成从登录态获取
         title: form.title.trim(),
         description: form.description.trim(),
         status: form.status,

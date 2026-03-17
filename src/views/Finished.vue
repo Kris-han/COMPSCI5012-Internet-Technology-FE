@@ -220,7 +220,6 @@ async function loadFinishedTasks() {
       keyword: searchKeyword.value,
       priority: priorityFilter.value,
       sort: sortBy.value,
-      uid:1001
     })
 
     const data = res?.data?.data || {}

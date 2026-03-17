@@ -1,17 +1,44 @@
 import axios from 'axios'
+import { getToken, clearAuth } from '@/utils/auth'
 
-// 建议：Vite 用 import.meta.env 读取环境变量
 const http = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:800/',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/',
   timeout: 10000,
   withCredentials: false,
 })
 
-// 可选：统一拦截器（请求/响应/错误）
+// 请求拦截器：自动带 token
+http.interceptors.request.use(
+  (config) => {
+    const token = getToken()
+
+    if (token) {
+      config.headers = config.headers || {}
+      config.headers.Authorization = `Bearer ${token}`
+    }
+
+    return config
+  },
+  (err) => {
+    return Promise.reject(err)
+  }
+)
+
+// 响应拦截器：统一处理 401
 http.interceptors.response.use(
   (res) => res,
   (err) => {
-    // 这里不要直接 alert，交给页面处理更灵活
+    const status = err?.response?.status || err?.response?.data?.code
+
+    if (status === 401) {
+      clearAuth()
+
+      const currentPath = window.location.pathname
+      if (currentPath !== '/login') {
+        window.location.href = '/login'
+      }
+    }
+
     return Promise.reject(err)
   }
 )

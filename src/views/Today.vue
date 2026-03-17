@@ -360,7 +360,6 @@ async function loadTodayTasks() {
   loading.value = true
   try {
     const res = await fetchTaskList({
-      uid: 1001,
       page: 1,
       page_size: 100,
     })
