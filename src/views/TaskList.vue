@@ -152,12 +152,31 @@ function handleSearch(value: string) {
   loadTaskList()
 }
 
-function handleStatusChange(task) {
-  ElMessage({
-    message: `Status changed: ${task.name}`,
-    type: 'success',
-  })
-  // 后面这里接更新状态接口
+async function handleStatusChange(task, newStatus) {
+  const oldStatus = task.status
+
+  try {
+    task.status = newStatus
+
+    await updateTask(task.id, {
+      status: newStatus,
+    })
+
+    ElMessage({
+      message: 'Task status updated successfully',
+      type: 'success',
+    })
+    loadTaskList()
+  } catch (error) {
+    task.status = oldStatus
+
+    ElMessage({
+      message: 'Failed to update task status',
+      type: 'error',
+    })
+
+    console.error('Failed to update task status:', error)
+  }
 }
 
 async function handleCommand(command, task) {
@@ -332,7 +351,7 @@ onMounted(() => {
             v-model="task.status"
             class="status-select"
             placeholder="Status"
-            @change="handleStatusChange(task)"
+            @change="(value) => handleStatusChange(task, value)"
           >
             <el-option
               v-for="item in statusOptions"
