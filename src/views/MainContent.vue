@@ -18,8 +18,12 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  todayRefreshKey: {
+    type: Number,
+    default: 0,
+  },
 })
-const emit = defineEmits(['add-task', 'update:searchKeyword'])
+const emit = defineEmits(['add-task', 'update:searchKeyword', 'go-task-list', 'open-task-detail'])
 
 const currentComponent = computed(() => {
   switch (props.activeKey) {
@@ -43,8 +47,11 @@ const currentComponent = computed(() => {
       :is="currentComponent"
       :active-project="activeProject"
       :search-keyword="searchKeyword"
+      :today-refresh-key="todayRefreshKey"
       @update:searchKeyword="emit('update:searchKeyword', $event)"
+      @go-task-list="emit('go-task-list')"
       @add-task="emit('add-task')"
+      @open-task-detail="emit('open-task-detail', $event)"
     />
   </section>
 </template>

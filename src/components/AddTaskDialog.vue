@@ -1,16 +1,24 @@
 <script setup>
 import { ref, reactive, computed, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import { addTask } from '@/api/task'
+import { addTask, updateTask } from '@/api/task'
 
 const props = defineProps({
   visible: {
     type: Boolean,
     default: false,
   },
+  mode: {
+    type: String,
+    default: 'add',
+  },
+  taskData: {
+    type: Object,
+    default: null,
+  },
 })
 
-const emit = defineEmits(['update:visible', 'created'])
+const emit = defineEmits(['update:visible', 'created', 'updated'])
 
 const submitting = ref(false)
 
@@ -45,20 +53,51 @@ const dialogVisible = computed({
     emit('update:visible', value)
   },
 })
+function tsToDateTimeLocal(ts) {
+  if (!ts) return ''
 
+  const date = new Date(Number(ts) * 1000)
+  const yyyy = date.getFullYear()
+  const MM = String(date.getMonth() + 1).padStart(2, '0')
+  const dd = String(date.getDate()).padStart(2, '0')
+  const hh = String(date.getHours()).padStart(2, '0')
+  const mm = String(date.getMinutes()).padStart(2, '0')
+  const ss = String(date.getSeconds()).padStart(2, '0')
+
+  return `${yyyy}-${MM}-${dd}T${hh}:${mm}:${ss}`
+}
 watch(
-  () => props.visible,
-  (value) => {
-    if (value) {
+  () => [props.visible, props.mode, props.taskData],
+  ([visible, mode, taskData]) => {
+    if (!visible) return
+
+    if (mode === 'edit' && taskData) {
+      form.title = taskData.title || ''
+      form.description = taskData.description || ''
+      form.priority = taskData.priority ?? 2
+      form.status = taskData.status ?? 1
+      form.project_id = taskData.project_id ?? ''
+      form.start_time = taskData.start_time_ts
+        ? tsToDateTimeLocal(taskData.start_time_ts)
+        : ''
+      form.end_time = taskData.end_time_ts
+        ? tsToDateTimeLocal(taskData.end_time_ts)
+        : ''
+
+      if (formRef.value) {
+        formRef.value.clearValidate()
+      }
+    } else {
       resetForm()
     }
-  }
+  },
+  { immediate: true }
 )
-
 function resetForm() {
   form.title = ''
   form.description = ''
   form.priority = 2
+  form.status = 1
   form.project_id = ''
   form.start_time = ''
   form.end_time = ''
@@ -107,32 +146,50 @@ async function handleConfirm() {
         uid: 1001, // 后面改成从登录态获取
         title: form.title.trim(),
         description: form.description.trim(),
+        status: form.status,
         priority: form.priority,
         project_id: form.project_id === '' ? null : Number(form.project_id),
         start_time_ts: startTimeTs,
         end_time_ts: endTimeTs,
       }
 
-      const res = await addTask(payload)
+      let res
 
-      if (res.code === 200) {
-        ElMessage.success('Task created successfully')
+      if (props.mode === 'edit' && props.taskData?.id) {
+        res = await updateTask(props.taskData.id, payload)
+      } else {
+        res = await addTask(payload)
+      }
+
+      if (res.code === 200 || (res.data && res.data.code === 200)) {
+        ElMessage.success(
+          props.mode === 'edit'
+            ? 'Task updated successfully'
+            : 'Task created successfully'
+        )
+
         dialogVisible.value = false
-        emit('created')
+
+        if (props.mode === 'edit') {
+          emit('updated')
+        } else {
+          emit('created')
+        }
+
         return
       }
 
-      if (res.data && res.data.code === 200) {
-        ElMessage.success('Task created successfully')
-        dialogVisible.value = false
-        emit('created')
-        return
-      }
-
-      ElMessage.error(res.message || res.data?.message || 'Create task failed')
+      ElMessage.error(
+        res.message ||
+        res.data?.message ||
+        (props.mode === 'edit' ? 'Update task failed' : 'Create task failed')
+      )
     } catch (error) {
-      console.error('Create task failed:', error)
-      ElMessage.error('Create task failed')
+      console.error(
+        props.mode === 'edit' ? 'Update task failed:' : 'Create task failed:',
+        error
+      )
+      ElMessage.error(props.mode === 'edit' ? 'Update task failed' : 'Create task failed')
     } finally {
       submitting.value = false
     }
@@ -143,7 +200,7 @@ async function handleConfirm() {
 <template>
   <el-dialog
     v-model="dialogVisible"
-    title="Add Task"
+    :title="props.mode === 'edit' ? 'Edit Task' : 'Add Task'"
     width="760px"
     destroy-on-close
     @close="handleClose"
@@ -170,6 +227,15 @@ async function handleConfirm() {
           :rows="4"
           placeholder="Optional"
         />
+      </el-form-item>
+
+      <el-form-item label="Status" prop="status">
+        <el-select v-model="form.status" placeholder="Select status" style="width: 100%">
+          <el-option label="To Do" :value="1" />
+          <el-option label="In Progress" :value="2" />
+          <el-option label="Completed" :value="3" />
+          <el-option label="Postponed" :value="4" />
+        </el-select>
       </el-form-item>
 
       <el-form-item label="Priority">
@@ -218,7 +284,7 @@ async function handleConfirm() {
           :loading="submitting"
           @click="handleConfirm"
         >
-          Confirm
+          {{ props.mode === 'edit' ? 'Update' : 'Confirm' }}
         </el-button>
       </div>
     </template>

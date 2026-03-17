@@ -11,6 +11,18 @@ const collapsed = ref(false)
 const showAdd = ref(false)
 const todayCount = ref(0)
 const searchKeyword = ref('')
+const todayRefreshKey = ref(0)
+
+
+const currentTask = ref(null)
+const showTaskDialog = ref(false)
+const dialogMode = ref('add')
+
+function handleTaskUpdated() {
+  showTaskDialog.value = false
+  currentTask.value = null
+  todayRefreshKey.value += 1
+}
 
 const onTaskCreated = () => {
   showAdd.value = false
@@ -18,6 +30,11 @@ const onTaskCreated = () => {
 }
 function handleSearch(value: string) {
   searchKeyword.value = value
+}
+function handleOpenTaskDetail(task) {
+  currentTask.value = task
+  dialogMode.value = 'edit'
+  showTaskDialog.value = true
 }
 </script>
 
@@ -37,14 +54,25 @@ function handleSearch(value: string) {
         :active-key="activeKey"
         :active-project="activeProject"
         :search-keyword="searchKeyword"
+        :today-refresh-key="todayRefreshKey"
         @update:searchKeyword="searchKeyword = $event"
+        @go-task-list="activeKey = 'taskList'"
         @add-task="showAdd = true"
+        @open-task-detail="handleOpenTaskDetail"
       />
     </main>
 
     <AddTaskDialog
       v-model:visible="showAdd"
       @created="onTaskCreated"
+    />
+
+    <AddTaskDialog
+      v-model:visible="showTaskDialog"
+      :mode="dialogMode"
+      :task-data="currentTask"
+      @created="onTaskCreated"
+      @updated="handleTaskUpdated"
     />
   </div>
 </template>
