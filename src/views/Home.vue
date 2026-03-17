@@ -56,6 +56,7 @@ function handleOpenTaskDetail(task) {
         :search-keyword="searchKeyword"
         :today-refresh-key="todayRefreshKey"
         @update:searchKeyword="searchKeyword = $event"
+        @update:todayCount="todayCount = $event"
         @go-task-list="activeKey = 'taskList'"
         @add-task="showAdd = true"
         @open-task-detail="handleOpenTaskDetail"

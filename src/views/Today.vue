@@ -227,7 +227,7 @@ const props = defineProps({
 const activeFilter = ref('all')
 const loading = ref(false)
 const taskList = ref([])
-const emit = defineEmits(['go-task-list', 'add-task', 'open-task-detail'])
+const emit = defineEmits(['go-task-list', 'add-task', 'open-task-detail', 'update:todayCount'])
 function getTodayStartAndEnd() {
   const now = new Date()
 
@@ -242,6 +242,9 @@ function getTodayStartAndEnd() {
     endTs: Math.floor(end.getTime() / 1000),
   }
 }
+const unfinishedCount = computed(() => {
+  return todayTasks.value.filter((task) => Number(task.status) !== 3).length
+})
 function getYesterdayStartAndEnd() {
   const now = new Date()
 
@@ -449,6 +452,13 @@ watch(
   () => {
     loadTodayTasks()
   }
+)
+watch(
+  unfinishedCount,
+  (value) => {
+    emit('update:todayCount', value)
+  },
+  { immediate: true }
 )
 onMounted(() => {
   loadTodayTasks()
