@@ -1,9 +1,9 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, defineAsyncComponent } from 'vue'
 import Dashboard from './Dashboard.vue'
-import Today from './Today.vue'
-import TaskList from './TaskList.vue'
-import Finished from './Finished.vue'
+const Today = defineAsyncComponent(() => import('./Today.vue'))
+const TaskList = defineAsyncComponent(() => import('./TaskList.vue'))
+const Finished = defineAsyncComponent(() => import('./Finished.vue'))
 
 const props = defineProps({
   activeKey: {

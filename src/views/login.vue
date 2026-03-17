@@ -1,5 +1,5 @@
 <template>
-  <div class="auth-page">
+  <main class="auth-page">
     <div class="auth-container">
       <div class="auth-left">
         <div class="brand-block">
@@ -10,7 +10,7 @@
           </p>
 
           <div class="brand-card">
-            <h3>Welcome back</h3>
+            <h2>Welcome back</h2>
             <p>
               Sign in to access your dashboard, track your progress, and manage your work efficiently.
             </p>
@@ -74,7 +74,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </main>
 </template>
 
 <script setup>
@@ -82,7 +82,7 @@ import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { login } from '@/api/auth'
-import { setToken, setUserInfo } from '@/utils/auth'
+import { setToken } from '@/utils/auth'
 import { useUserStore } from '@/store/user'
 
 const router = useRouter()
@@ -185,7 +185,7 @@ async function handleLogin() {
   width: 58px;
   height: 58px;
   border-radius: 18px;
-  background: #3b82f6;
+  background: #1d4ed8;
   color: #ffffff;
   font-size: 28px;
   font-weight: 700;
@@ -217,7 +217,7 @@ async function handleLogin() {
   backdrop-filter: blur(6px);
 }
 
-.brand-card h3 {
+.brand-card h2 {
   margin: 0 0 10px;
   font-size: 20px;
   color: #111827;
@@ -271,7 +271,7 @@ async function handleLogin() {
 }
 
 .link-text {
-  color: #3b82f6;
+  color: #1d4ed8;
   cursor: pointer;
   font-size: 14px;
 }
@@ -291,7 +291,7 @@ async function handleLogin() {
 }
 
 .switch-auth a {
-  color: #3b82f6;
+  color: #1d4ed8;
   text-decoration: none;
   margin-left: 6px;
   font-weight: 600;

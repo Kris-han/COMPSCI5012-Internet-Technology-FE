@@ -10,13 +10,14 @@
       </div>
 
       <div class="sidebar_actions">
-        <el-button circle size="small" :icon="Bell" />
-        <el-button circle size="small" :icon="MoreFilled" />
+        <el-button circle size="small" :icon="Bell" aria-label="Notifications" />
+        <el-button circle size="small" :icon="MoreFilled" aria-label="More options" />
         <el-button
           circle
           size="small"
           class="collapse_btn"
           :icon="collapsed ? Expand : Fold"
+          :aria-label="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
           @click="$emit('update:collapsed', !collapsed)"
         />
       </div>

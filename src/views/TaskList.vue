@@ -64,7 +64,6 @@ function tsToDateTimeLocal(ts) {
 }
 function handleTaskSearch(value: string) {
   emit('update:searchKeyword', value)
-  emit('search', value)
 }
 function dateTimeLocalToTs(value) {
   if (!value) return null
@@ -113,14 +112,6 @@ async function loadTaskList() {
       page_size: pageSize.value,
       keyword: (props.searchKeyword || '').trim(),
     })
-
-    if (res.code === 200) {
-      tasks.value = res.data.list || []
-      total.value = res.data.total || 0
-      currentPage.value = res.data.page || 1
-      pageSize.value = res.data.page_size || 12
-      return
-    }
 
     if (res.data && res.data.code === 200) {
       tasks.value = res.data.data.list || []
@@ -304,7 +295,7 @@ onMounted(() => {
               trigger="click"
               @command="(command) => handleCommand(command, task)"
             >
-              <el-button text class="more-btn">
+              <el-button text class="more-btn" aria-label="More actions">
                 <el-icon><MoreFilled /></el-icon>
               </el-button>
 
@@ -367,6 +358,7 @@ onMounted(() => {
           class="page-btn"
           :icon="ArrowLeft"
           :disabled="currentPage === 1"
+          aria-label="Previous page"
           @click="goToPage(currentPage - 1)"
         />
 
@@ -384,6 +376,7 @@ onMounted(() => {
           class="page-btn"
           :icon="ArrowRight"
           :disabled="currentPage === totalPages"
+          aria-label="Next page"
           @click="goToPage(currentPage + 1)"
         />
       </div>
@@ -552,7 +545,7 @@ onMounted(() => {
 
 .task-card__time-title {
   font-size: 13px;
-  color: #909399;
+  color: #595959;
 }
 
 .task-card__time-value {

@@ -9,8 +9,8 @@
 
     <div class="task-item__right">
       <span v-if="task.due_date" class="task-item__date">{{ formatDate(task.due_date) }}</span>
-      <el-button size="small" :icon="Edit" circle @click="onEdit" />
-      <el-button size="small" :icon="Delete" circle type="danger" @click="onDelete" />
+      <el-button size="small" :icon="Edit" circle aria-label="Edit task" @click="onEdit" />
+      <el-button size="small" :icon="Delete" circle type="danger" aria-label="Delete task" @click="onDelete" />
     </div>
   </div>
 
