@@ -14,8 +14,12 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  searchKeyword: {
+    type: String,
+    default: '',
+  },
 })
-const emit = defineEmits(['add-task'])
+const emit = defineEmits(['add-task', 'update:searchKeyword'])
 
 const currentComponent = computed(() => {
   switch (props.activeKey) {
@@ -38,6 +42,8 @@ const currentComponent = computed(() => {
     <component
       :is="currentComponent"
       :active-project="activeProject"
+      :search-keyword="searchKeyword"
+      @update:searchKeyword="emit('update:searchKeyword', $event)"
       @add-task="emit('add-task')"
     />
   </section>

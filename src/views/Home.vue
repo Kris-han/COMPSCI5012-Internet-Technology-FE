@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import SidebarMenu from './SidebarMenu.vue'
 import MainContent from './MainContent.vue'
@@ -10,10 +10,14 @@ const collapsed = ref(false)
 
 const showAdd = ref(false)
 const todayCount = ref(0)
+const searchKeyword = ref('')
 
 const onTaskCreated = () => {
   showAdd.value = false
   // 后面这里可以加刷新逻辑
+}
+function handleSearch(value: string) {
+  searchKeyword.value = value
 }
 </script>
 
@@ -23,6 +27,7 @@ const onTaskCreated = () => {
       v-model:activeKey="activeKey"
       v-model:activeProject="activeProject"
       v-model:collapsed="collapsed"
+      v-model:searchKeyword="searchKeyword"
       :todayCount="todayCount"
       @add-task="showAdd = true"
     />
@@ -31,6 +36,8 @@ const onTaskCreated = () => {
       <MainContent
         :active-key="activeKey"
         :active-project="activeProject"
+        :search-keyword="searchKeyword"
+        @update:searchKeyword="searchKeyword = $event"
         @add-task="showAdd = true"
       />
     </main>

@@ -28,3 +28,7 @@ export function getTaskList(params = {}) {
 export function getUserList() {
   return http.get('/user/list')
 }
+
+export function searchTask(params = {}) {
+  return http.post('/task/search_task', { params })
+}

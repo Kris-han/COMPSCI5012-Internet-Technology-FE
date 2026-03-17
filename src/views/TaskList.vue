@@ -1,23 +1,28 @@
-<script setup>
+<script setup lang="ts">
 import {
   Search,
   MoreFilled,
   ArrowLeft,
   ArrowRight,
 } from '@element-plus/icons-vue'
-import {ref, computed, onMounted, reactive} from 'vue'
+import {ref, computed, onMounted, watch, reactive} from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { fetchTaskList } from '@/api/task_list'
-import { addTask, updateTask, getTask, deleteTask } from '@/api/task'
+import { addTask, updateTask, getTask, deleteTask,searchTask } from '@/api/task'
 
 const loading = ref(false)
-const searchKeyword = ref('')
 const currentPage = ref(1)
 const pageSize = ref(12)
 const total = ref(0)
 
 const tasks = ref([])
+const props = defineProps<{
+  searchKeyword?: string
+}>()
 
+const emit = defineEmits<{
+  (e: 'update:searchKeyword', v: string): void
+}>()
 const statusOptions = [
   { label: 'To Do', value: 1 },
   { label: 'In Progress', value: 2 },
@@ -57,7 +62,10 @@ function tsToDateTimeLocal(ts) {
   const mm = String(date.getMinutes()).padStart(2, '0')
   return `${yyyy}-${MM}-${dd}T${hh}:${mm}`
 }
-
+function handleTaskSearch(value: string) {
+  emit('update:searchKeyword', value)
+  emit('search', value)
+}
 function dateTimeLocalToTs(value) {
   if (!value) return null
   return Math.floor(new Date(value).getTime() / 1000)
@@ -104,7 +112,7 @@ async function loadTaskList() {
       uid: 1001, // 后面改成从登录态获取
       page: currentPage.value,
       page_size: pageSize.value,
-      keyword: searchKeyword.value.trim(),
+      keyword: (props.searchKeyword || '').trim(),
     })
 
     if (res.code === 200) {
@@ -138,7 +146,8 @@ function goToPage(page) {
   loadTaskList()
 }
 
-function handleSearch() {
+function handleSearch(value: string) {
+  emit('update:searchKeyword', value)
   currentPage.value = 1
   loadTaskList()
 }
@@ -235,7 +244,13 @@ async function handleSubmit() {
     console.error(error)
   }
 }
-
+watch(
+  () => props.searchKeyword,
+  () => {
+    currentPage.value = 1
+    loadTaskList()
+  }
+)
 onMounted(() => {
   loadTaskList()
 })
@@ -246,7 +261,7 @@ onMounted(() => {
     <div class="task-shell">
       <div class="task-topbar">
         <el-input
-          v-model="searchKeyword"
+          :model-value="searchKeyword"
           class="task-search"
           placeholder="Search Task"
           :prefix-icon="Search"

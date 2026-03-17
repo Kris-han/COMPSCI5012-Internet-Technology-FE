@@ -38,9 +38,11 @@
     <el-input
       v-if="!collapsed"
       class="sidebar_search"
-      placeholder="搜索"
+      :model-value="searchKeyword"
+      placeholder="Search"
       :prefix-icon="Search"
       clearable
+      @input="handleSidebarSearch"
     />
 
     <!-- Menu -->
@@ -77,7 +79,7 @@
 
     <!-- Footer -->
     <div v-if="!collapsed" class="sidebar_footer">
-      <el-button text :icon="SwitchButton">退出</el-button>
+      <el-button text :icon="SwitchButton">log out</el-button>
     </div>
   </aside>
 </template>
@@ -103,14 +105,20 @@ const props = defineProps<{
   activeProject?: string
   collapsed?: boolean
   todayCount?: number
+  searchKeyword?: string
 }>()
 
 const emit = defineEmits<{
   (e: "update:activeKey", v: string): void
   (e: "update:collapsed", v: boolean): void
   (e: "update:activeProject", v: string): void
+  (e: "update:searchKeyword", v: string): void
   (e: "add-task"): void
 }>()
+
+function handleSidebarSearch(value: string) {
+  emit("update:searchKeyword", value)
+}
 
 function onSelect(key: string) {
   emit("update:activeKey", key)
