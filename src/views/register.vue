@@ -1,5 +1,5 @@
 <template>
-  <div class="auth-page">
+  <main class="auth-page">
     <div class="auth-container">
       <div class="auth-left">
         <div class="brand-block">
@@ -10,7 +10,7 @@
           </p>
 
           <div class="brand-card">
-            <h3>Create your workspace</h3>
+            <h2>Create your workspace</h2>
             <p>
               Register a new account and begin building a cleaner, more organized workflow for your daily tasks.
             </p>
@@ -87,7 +87,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </main>
 </template>
 
 <script setup>
@@ -225,7 +225,7 @@ async function handleRegister() {
   width: 58px;
   height: 58px;
   border-radius: 18px;
-  background: #3b82f6;
+  background: #1d4ed8;
   color: #ffffff;
   font-size: 28px;
   font-weight: 700;
@@ -257,7 +257,7 @@ async function handleRegister() {
   backdrop-filter: blur(6px);
 }
 
-.brand-card h3 {
+.brand-card h2 {
   margin: 0 0 10px;
   font-size: 20px;
   color: #111827;
@@ -318,7 +318,7 @@ async function handleRegister() {
 }
 
 .switch-auth a {
-  color: #3b82f6;
+  color: #1d4ed8;
   text-decoration: none;
   margin-left: 6px;
   font-weight: 600;
