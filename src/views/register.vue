@@ -4,7 +4,7 @@
       <div class="auth-left">
         <div class="brand-block">
           <div class="brand-logo">T</div>
-          <h1 class="brand-title">TaskFlow</h1>
+          <h1 class="brand-title">ToDo List</h1>
           <p class="brand-desc">
             Create your account to start planning tasks, tracking progress, and improving productivity.
           </p>

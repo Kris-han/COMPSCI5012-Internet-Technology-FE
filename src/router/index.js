@@ -3,6 +3,7 @@ import Home from '../views/Home.vue'
 import About from '../views/About.vue'
 import Login from '../views/login.vue'
 import Register from '../views/register.vue'
+import ResetPassword  from '../views/resetPassword.vue'
 import { getToken } from '@/utils/auth'
 
 const routes = [
@@ -34,6 +35,11 @@ const routes = [
     meta: {
       public: true,
     },
+  },
+  {
+    path: '/reset-password',
+    name: 'ResetPassword',
+    component: ResetPassword,
   },
 ]
 
