@@ -31,7 +31,7 @@
       :icon="Plus"
       @click="$emit('add-task')"
     >
-      添加任务
+      Add New Task
     </el-button>
 
     <!-- Search -->
@@ -75,25 +75,9 @@
       </el-menu-item>
     </el-menu>
 
-    <!-- Projects -->
-    <div v-if="!collapsed" class="sidebar_section">
-      <div class="sidebar_section-title">My team</div>
-
-      <el-menu class="sidebar_menu" :default-active="activeProject" @select="onSelectProject">
-        <el-menu-item index="guide">
-          <el-icon><Document /></el-icon>
-          <span class="menu_text">Group DI</span>
-          <span class="menu_right">
-            <span class="sidebar_count">19</span>
-          </span>
-        </el-menu-item>
-      </el-menu>
-    </div>
-
     <!-- Footer -->
     <div v-if="!collapsed" class="sidebar_footer">
-      <el-button text :icon="Plus">添加一个团队</el-button>
-      <el-button text :icon="QuestionFilled">帮助&资源</el-button>
+      <el-button text :icon="SwitchButton">退出</el-button>
     </div>
   </aside>
 </template>
@@ -109,7 +93,7 @@ import {
   Clock,
   CircleCheck,
   Document,
-  QuestionFilled,
+  SwitchButton,
   Fold,
   Expand,
 } from "@element-plus/icons-vue"

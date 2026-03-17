@@ -15,6 +15,11 @@ export function deleteTask(id) {
   return http.delete(`/task/task_detail/${id}`)
 }
 
+// get
+export function getTask(id) {
+  return http.get(`/task/task_detail/${id}`)
+}
+
 // GET
 export function getTaskList(params = {}) {
   return http.get('/task/task_list', { params })

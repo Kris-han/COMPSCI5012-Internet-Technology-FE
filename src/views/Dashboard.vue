@@ -4,7 +4,7 @@ import { Plus } from '@element-plus/icons-vue'
 import { fetchDashboardData } from '@/api/dashboard'
 
 const loading = ref(false)
-
+const emit = defineEmits(['add-task'])
 const dashboardData = ref({
   summary: {
     total_tasks: 0,
@@ -120,9 +120,10 @@ onMounted(() => {
 <template>
   <div class="dashboard-page" v-loading="loading">
     <div class="dashboard-topbar">
-      <el-button type="primary" class="add-task-btn" :icon="Plus">
+      <el-button type="primary" class="add-task-btn" :icon="Plus" @click="$emit('add-task')">
         Add New Task
       </el-button>
+
     </div>
 
     <div class="dashboard-main">

@@ -5,394 +5,246 @@ import {
   ArrowLeft,
   ArrowRight,
 } from '@element-plus/icons-vue'
-import { ref, computed } from 'vue'
+import {ref, computed, onMounted, reactive} from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { fetchTaskList } from '@/api/task_list'
+import { addTask, updateTask, getTask, deleteTask } from '@/api/task'
 
+const loading = ref(false)
 const searchKeyword = ref('')
 const currentPage = ref(1)
-const pageSize = 12
+const pageSize = ref(12)
+const total = ref(0)
 
-const tasks = ref([
-  {
-    id: 1,
-    name: 'Task Name',
-    project: 'project',
-    start: '12-03-2026',
-    end: '18-03-2026',
-    status: 'To Do',
-    priority: 'High',
-    executors: [
-      { name: 'Chris', avatar: '' },
-      { name: 'Amy', avatar: '' },
-    ],
-  },
-  {
-    id: 2,
-    name: 'Task Name',
-    project: 'project',
-    start: '13-03-2026',
-    end: '19-03-2026',
-    status: 'In Progress',
-    priority: 'Medium',
-    executors: [
-      { name: 'Tom', avatar: '' },
-    ],
-  },
-  {
-    id: 3,
-    name: 'Task Name',
-    project: 'project',
-    start: '14-03-2026',
-    end: '20-03-2026',
-    status: 'Completed',
-    priority: 'Low',
-    executors: [
-      { name: 'Lily', avatar: '' },
-      { name: 'Sam', avatar: '' },
-    ],
-  },
-  {
-    id: 4,
-    name: 'Task Name',
-    project: 'project',
-    start: '15-03-2026',
-    end: '21-03-2026',
-    status: 'Postponed',
-    priority: 'High',
-    executors: [
-      { name: 'Leo', avatar: '' },
-    ],
-  },
-  {
-    id: 5,
-    name: 'Task Name',
-    project: 'project',
-    start: '16-03-2026',
-    end: '22-03-2026',
-    status: 'To Do',
-    priority: 'Low',
-    executors: [
-      { name: 'Nina', avatar: '' },
-      { name: 'Ben', avatar: '' },
-    ],
-  },
-  {
-    id: 6,
-    name: 'Task Name',
-    project: 'project',
-    start: '17-03-2026',
-    end: '23-03-2026',
-    status: 'In Progress',
-    priority: 'Medium',
-    executors: [
-      { name: 'Ava', avatar: '' },
-    ],
-  },
-  {
-    id: 7,
-    name: 'Task Name',
-    project: 'project',
-    start: '18-03-2026',
-    end: '24-03-2026',
-    status: 'Completed',
-    priority: 'Low',
-    executors: [
-      { name: 'Mia', avatar: '' },
-      { name: 'Noah', avatar: '' },
-    ],
-  },
-  {
-    id: 8,
-    name: 'Task Name',
-    project: 'project',
-    start: '19-03-2026',
-    end: '25-03-2026',
-    status: 'To Do',
-    priority: 'High',
-    executors: [
-      { name: 'Jack', avatar: '' },
-    ],
-  },
-  {
-    id: 9,
-    name: 'Task Name',
-    project: 'project',
-    start: '20-03-2026',
-    end: '26-03-2026',
-    status: 'Postponed',
-    priority: 'Medium',
-    executors: [
-      { name: 'Emma', avatar: '' },
-    ],
-  },
-  {
-    id: 10,
-    name: 'Task Name',
-    project: 'project',
-    start: '21-03-2026',
-    end: '27-03-2026',
-    status: 'To Do',
-    priority: 'Low',
-    executors: [
-      { name: 'Ivy', avatar: '' },
-    ],
-  },
-  {
-    id: 11,
-    name: 'Task Name',
-    project: 'project',
-    start: '22-03-2026',
-    end: '28-03-2026',
-    status: 'In Progress',
-    priority: 'High',
-    executors: [
-      { name: 'Luke', avatar: '' },
-      { name: 'Anna', avatar: '' },
-    ],
-  },
-  {
-    id: 12,
-    name: 'Task Name',
-    project: 'project',
-    start: '23-03-2026',
-    end: '29-03-2026',
-    status: 'Completed',
-    priority: 'Medium',
-    executors: [
-      { name: 'Eva', avatar: '' },
-    ],
-  },
-  {
-    id: 13,
-    name: 'Task Name',
-    project: 'project',
-    start: '24-03-2026',
-    end: '30-03-2026',
-    status: 'To Do',
-    priority: 'Low',
-    executors: [
-      { name: 'Chris', avatar: '' },
-    ],
-  },
-  {
-    id: 14,
-    name: 'Task Name',
-    project: 'project',
-    start: '25-03-2026',
-    end: '31-03-2026',
-    status: 'Postponed',
-    priority: 'High',
-    executors: [
-      { name: 'Amy', avatar: '' },
-    ],
-  },
-  {
-    id: 15,
-    name: 'Task Name',
-    project: 'project',
-    start: '26-03-2026',
-    end: '01-04-2026',
-    status: 'To Do',
-    priority: 'Medium',
-    executors: [
-      { name: 'Tom', avatar: '' },
-      { name: 'Lily', avatar: '' },
-    ],
-  },
-  {
-    id: 16,
-    name: 'Task Name',
-    project: 'project',
-    start: '27-03-2026',
-    end: '02-04-2026',
-    status: 'In Progress',
-    priority: 'High',
-    executors: [
-      { name: 'Sam', avatar: '' },
-    ],
-  },
-  {
-    id: 17,
-    name: 'Task Name',
-    project: 'project',
-    start: '28-03-2026',
-    end: '03-04-2026',
-    status: 'Completed',
-    priority: 'Low',
-    executors: [
-      { name: 'Leo', avatar: '' },
-    ],
-  },
-  {
-    id: 18,
-    name: 'Task Name',
-    project: 'project',
-    start: '29-03-2026',
-    end: '04-04-2026',
-    status: 'To Do',
-    priority: 'Medium',
-    executors: [
-      { name: 'Ben', avatar: '' },
-      { name: 'Nina', avatar: '' },
-    ],
-  },
-  {
-    id: 19,
-    name: 'Task Name',
-    project: 'project',
-    start: '30-03-2026',
-    end: '05-04-2026',
-    status: 'Postponed',
-    priority: 'High',
-    executors: [
-      { name: 'Ava', avatar: '' },
-    ],
-  },
-  {
-    id: 20,
-    name: 'Task Name',
-    project: 'project',
-    start: '31-03-2026',
-    end: '06-04-2026',
-    status: 'To Do',
-    priority: 'Low',
-    executors: [
-      { name: 'Mia', avatar: '' },
-    ],
-  },
-  {
-    id: 21,
-    name: 'Task Name',
-    project: 'project',
-    start: '01-04-2026',
-    end: '07-04-2026',
-    status: 'In Progress',
-    priority: 'Medium',
-    executors: [
-      { name: 'Noah', avatar: '' },
-    ],
-  },
-  {
-    id: 22,
-    name: 'Task Name',
-    project: 'project',
-    start: '02-04-2026',
-    end: '08-04-2026',
-    status: 'Completed',
-    priority: 'High',
-    executors: [
-      { name: 'Jack', avatar: '' },
-      { name: 'Emma', avatar: '' },
-    ],
-  },
-  {
-    id: 23,
-    name: 'Task Name',
-    project: 'project',
-    start: '03-04-2026',
-    end: '09-04-2026',
-    status: 'To Do',
-    priority: 'Low',
-    executors: [
-      { name: 'Ivy', avatar: '' },
-    ],
-  },
-  {
-    id: 24,
-    name: 'Task Name',
-    project: 'project',
-    start: '04-04-2026',
-    end: '10-04-2026',
-    status: 'Postponed',
-    priority: 'Medium',
-    executors: [
-      { name: 'Luke', avatar: '' },
-    ],
-  },
-])
+const tasks = ref([])
 
-const statusOptions = ['To Do', 'In Progress', 'Completed', 'Postponed']
+const statusOptions = [
+  { label: 'To Do', value: 1 },
+  { label: 'In Progress', value: 2 },
+  { label: 'Completed', value: 3 },
+  { label: 'Postponed', value: 4 },
+]
+const dialogVisible = ref(false)
+const dialogMode = ref('add') // add / edit
+const currentTaskId = ref(null)
 
-const filteredTasks = computed(() => {
-  const keyword = searchKeyword.value.trim().toLowerCase()
-  if (!keyword) return tasks.value
-
-  return tasks.value.filter(
-    (task) =>
-      task.name.toLowerCase().includes(keyword) ||
-      task.project.toLowerCase().includes(keyword) ||
-      task.status.toLowerCase().includes(keyword) ||
-      task.priority.toLowerCase().includes(keyword) ||
-      task.executors.some((item) => item.name.toLowerCase().includes(keyword))
-  )
+const form = reactive({
+  title: '',
+  description: '',
+  status: 1,
+  priority: 2,
+  start_time: '',
+  end_time: '',
+  project_id: '',
 })
 
-const totalPages = computed(() => Math.ceil(filteredTasks.value.length / pageSize))
+function resetForm() {
+  form.title = ''
+  form.description = ''
+  form.status = 1
+  form.priority = 2
+  form.start_time = ''
+  form.end_time = ''
+  form.project_id = ''
+}
+function tsToDateTimeLocal(ts) {
+  if (!ts) return ''
+  const date = new Date(Number(ts) * 1000)
+  const yyyy = date.getFullYear()
+  const MM = String(date.getMonth() + 1).padStart(2, '0')
+  const dd = String(date.getDate()).padStart(2, '0')
+  const hh = String(date.getHours()).padStart(2, '0')
+  const mm = String(date.getMinutes()).padStart(2, '0')
+  return `${yyyy}-${MM}-${dd}T${hh}:${mm}`
+}
 
-const paginatedTasks = computed(() => {
-  const start = (currentPage.value - 1) * pageSize
-  const end = start + pageSize
-  return filteredTasks.value.slice(start, end)
+function dateTimeLocalToTs(value) {
+  if (!value) return null
+  return Math.floor(new Date(value).getTime() / 1000)
+}
+
+const totalPages = computed(() => {
+  return Math.max(1, Math.ceil(total.value / pageSize.value))
 })
 
 const visiblePages = computed(() => {
-  return Array.from({ length: totalPages.value }, (_, i) => i + 1).slice(0, 5)
+  const totalPageCount = totalPages.value
+  const page = currentPage.value
+
+  let start = Math.max(1, page - 2)
+  let end = Math.min(totalPageCount, start + 4)
+
+  if (end - start < 4) {
+    start = Math.max(1, end - 4)
+  }
+
+  return Array.from({ length: end - start + 1 }, (_, i) => start + i)
 })
+
+const displayTasks = computed(() => {
+  return tasks.value.map((task) => ({
+    ...task,
+    name: task.title || '',
+    project: task.project_name || 'project',
+    start: task.start_time_text || '',
+    end: task.end_time_text || '',
+  }))
+})
+
+function getPriorityColor(priority) {
+  if (priority === 3 || priority === 'High') return '#EF4444'
+  if (priority === 2 || priority === 'Medium') return '#F59E0B'
+  return '#22C55E'
+}
+
+async function loadTaskList() {
+  loading.value = true
+  try {
+    const res = await fetchTaskList({
+      uid: 1001, // 后面改成从登录态获取
+      page: currentPage.value,
+      page_size: pageSize.value,
+      keyword: searchKeyword.value.trim(),
+    })
+
+    if (res.code === 200) {
+      tasks.value = res.data.list || []
+      total.value = res.data.total || 0
+      currentPage.value = res.data.page || 1
+      pageSize.value = res.data.page_size || 12
+      return
+    }
+
+    if (res.data && res.data.code === 200) {
+      tasks.value = res.data.data.list || []
+      total.value = res.data.data.total || 0
+      currentPage.value = res.data.data.page || 1
+      pageSize.value = res.data.data.page_size || 12
+    }
+  } catch (error) {
+    console.error('Failed to fetch task list:', error)
+    ElMessage({
+      message: 'Failed to load task list',
+      type: 'error',
+    })
+  } finally {
+    loading.value = false
+  }
+}
 
 function goToPage(page) {
   if (page < 1 || page > totalPages.value) return
   currentPage.value = page
+  loadTaskList()
 }
 
 function handleSearch() {
   currentPage.value = 1
+  loadTaskList()
 }
 
-function getPriorityColor(priority) {
-  if (priority === 'High') return '#EF4444'
-  if (priority === 'Medium') return '#F59E0B'
-  return '#22C55E'
+function handleStatusChange(task) {
+  ElMessage({
+    message: `Status changed: ${task.name}`,
+    type: 'success',
+  })
+  // 后面这里接更新状态接口
 }
 
-function handleCommand(command, task) {
+async function handleCommand(command, task) {
   if (command === 'edit') {
-    ElMessage({
-      message: `Edit task: ${task.name}`,
-      type: 'info',
-    })
+    await openEditDialog(task)
+    return
   }
 
   if (command === 'delete') {
-    ElMessageBox.confirm(
-      `Are you sure you want to delete "${task.name}"?`,
-      'Delete Task',
-      {
-        confirmButtonText: 'Delete',
-        cancelButtonText: 'Cancel',
-        type: 'warning',
-      }
-    )
-      .then(() => {
-        tasks.value = tasks.value.filter((item) => item.id !== task.id)
-        if (currentPage.value > totalPages.value) {
-          currentPage.value = Math.max(1, totalPages.value)
+    try {
+      await ElMessageBox.confirm(
+        `Are you sure you want to delete "${task.name}"?`,
+        'Delete Task',
+        {
+          confirmButtonText: 'Delete',
+          cancelButtonText: 'Cancel',
+          type: 'warning',
         }
-        ElMessage({
-          message: 'Task deleted successfully',
-          type: 'success',
-        })
+      )
+
+      await deleteTask(task.id)
+
+      ElMessage({
+        message: 'Task deleted successfully',
+        type: 'success',
       })
-      .catch(() => {})
+
+      loadTaskList()
+    } catch (error) {
+      // 用户点击取消时，不提示失败
+      console.log('Delete cancelled or failed:', error)
+    }
   }
 }
+async function openEditDialog(task) {
+  try {
+    dialogMode.value = 'edit'
+    currentTaskId.value = task.id
+
+    resetForm()
+
+    const res = await getTask(task.id)
+    const detail = res.data?.data || res.data || {}
+
+    form.title = detail.title || ''
+    form.description = detail.description || ''
+    form.status = detail.status ?? 1
+    form.priority = detail.priority ?? 2
+    form.start_time = tsToDateTimeLocal(detail.start_time_ts)
+    form.end_time = tsToDateTimeLocal(detail.end_time_ts)
+    form.project_id = detail.project_id ?? ''
+
+    dialogVisible.value = true
+  } catch (error) {
+    ElMessage.error('Failed to load task detail')
+    console.error(error)
+  }
+}
+async function handleSubmit() {
+  try {
+    const payload = {
+      title: form.title,
+      description: form.description,
+      status: form.status,
+      priority: form.priority,
+      start_time_ts: dateTimeLocalToTs(form.start_time),
+      end_time_ts: dateTimeLocalToTs(form.end_time),
+      project_id: form.project_id ? Number(form.project_id) : null,
+    }
+
+    if (dialogMode.value === 'add') {
+      await addTask(payload)
+      ElMessage.success('Task added successfully')
+    } else {
+      await updateTask(currentTaskId.value, payload)
+      ElMessage.success('Task updated successfully')
+    }
+
+    dialogVisible.value = false
+    resetForm()
+    await loadTaskList()
+  } catch (error) {
+    ElMessage.error(dialogMode.value === 'add' ? 'Failed to add task' : 'Failed to update task')
+    console.error(error)
+  }
+}
+
+onMounted(() => {
+  loadTaskList()
+})
 </script>
 
 <template>
-  <div class="task-page">
+  <div class="task-page" v-loading="loading">
     <div class="task-shell">
       <div class="task-topbar">
-        <div class="task-total">({{ filteredTasks.length }})</div>
-
         <el-input
           v-model="searchKeyword"
           class="task-search"
@@ -405,7 +257,7 @@ function handleCommand(command, task) {
 
       <div class="task-grid">
         <div
-          v-for="task in paginatedTasks"
+          v-for="task in displayTasks"
           :key="task.id"
           class="task-card"
         >
@@ -434,46 +286,44 @@ function handleCommand(command, task) {
             </el-dropdown>
           </div>
 
-          <div class="task-card__executor-label">Executor</div>
+          <div class="task-card__info-label">Time Range</div>
 
-          <div class="task-card__executor-row">
-            <div class="executor-avatars">
-              <el-avatar
-                v-for="person in task.executors"
-                :key="person.name"
-                :size="28"
-                class="executor-avatar"
-              >
-                {{ person.name.charAt(0).toUpperCase() }}
-              </el-avatar>
+          <div class="task-card__time-row">
+            <div class="task-card__time-block">
+              <div class="task-card__time-title">Start</div>
+              <div class="task-card__time-value">{{ task.start }}</div>
             </div>
 
             <div
               class="priority-dot"
               :style="{ background: getPriorityColor(task.priority) }"
-              :title="task.priority"
+              :title="task.priority_text"
             ></div>
           </div>
 
-          <div class="task-card__priority-text">
-            Priority: {{ task.priority }}
+          <div class="task-card__time-block task-card__time-block--end">
+            <div class="task-card__time-title">End</div>
+            <div class="task-card__time-value">{{ task.end }}</div>
           </div>
 
-          <div class="task-card__dates">
-            <div>{{ task.start }}</div>
-            <div>{{ task.end }}</div>
+          <div class="task-card__priority-text">
+            Priority:
+            <span class="task-card__priority-value">
+              {{ task.priority_text }}
+            </span>
           </div>
 
           <el-select
             v-model="task.status"
             class="status-select"
             placeholder="Status"
+            @change="handleStatusChange(task)"
           >
             <el-option
               v-for="item in statusOptions"
-              :key="item"
-              :label="item"
-              :value="item"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
             />
           </el-select>
         </div>
@@ -506,6 +356,71 @@ function handleCommand(command, task) {
       </div>
     </div>
   </div>
+  <el-dialog
+  v-model="dialogVisible"
+  :title="dialogMode === 'add' ? 'Add Task' : 'Edit Task'"
+  width="600px"
+>
+  <el-form :model="form" label-width="120px">
+    <el-form-item label="Title">
+      <el-input v-model="form.title" />
+    </el-form-item>
+
+    <el-form-item label="Description">
+      <el-input v-model="form.description" type="textarea" />
+    </el-form-item>
+
+    <el-form-item label="Status">
+      <el-select v-model="form.status">
+        <el-option
+          v-for="item in statusOptions"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        />
+      </el-select>
+    </el-form-item>
+
+    <el-form-item label="Priority">
+      <el-select v-model="form.priority">
+        <el-option label="Low" :value="1" />
+        <el-option label="Medium" :value="2" />
+        <el-option label="High" :value="3" />
+      </el-select>
+    </el-form-item>
+
+    <el-form-item label="Start Time">
+      <el-date-picker
+        v-model="form.start_time"
+        type="datetime"
+        value-format="YYYY-MM-DDTHH:mm"
+        placeholder="Select start time"
+        style="width: 100%"
+      />
+    </el-form-item>
+
+    <el-form-item label="End Time">
+      <el-date-picker
+        v-model="form.end_time"
+        type="datetime"
+        value-format="YYYY-MM-DDTHH:mm"
+        placeholder="Select end time"
+        style="width: 100%"
+      />
+    </el-form-item>
+
+    <el-form-item label="Project ID">
+      <el-input v-model="form.project_id" />
+    </el-form-item>
+  </el-form>
+
+  <template #footer>
+    <el-button @click="dialogVisible = false">Cancel</el-button>
+    <el-button type="primary" @click="handleSubmit">
+      {{ dialogMode === 'add' ? 'Create' : 'Update' }}
+    </el-button>
+  </template>
+</el-dialog>
 </template>
 
 <style scoped>
@@ -532,12 +447,6 @@ function handleCommand(command, task) {
   margin-bottom: 18px;
 }
 
-.task-total {
-  font-size: 18px;
-  font-weight: 700;
-  color: #303133;
-}
-
 .task-search {
   width: 220px;
 }
@@ -555,6 +464,8 @@ function handleCommand(command, task) {
   background: #fff;
   min-height: 240px;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
 .task-card__top {
@@ -582,31 +493,38 @@ function handleCommand(command, task) {
   color: #606266;
 }
 
-.task-card__executor-label {
+.task-card__info-label {
   margin-top: 14px;
   font-size: 15px;
   font-weight: 700;
   color: #303133;
 }
 
-.task-card__executor-row {
+.task-card__time-row {
   margin-top: 10px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
 }
 
-.executor-avatars {
+.task-card__time-block {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.executor-avatar {
-  margin-right: -6px;
-  border: 2px solid #fff;
-  background: #93c5fd;
-  color: #1e3a8a;
-  font-weight: 700;
+.task-card__time-block--end {
+  margin-top: 10px;
+}
+
+.task-card__time-title {
+  font-size: 13px;
+  color: #909399;
+}
+
+.task-card__time-value {
+  font-size: 14px;
+  color: #606266;
 }
 
 .priority-dot {
@@ -619,21 +537,19 @@ function handleCommand(command, task) {
 }
 
 .task-card__priority-text {
-  margin-top: 10px;
+  margin-top: 12px;
   font-size: 13px;
   color: #606266;
 }
 
-.task-card__dates {
-  margin-top: 14px;
-  font-size: 14px;
-  line-height: 1.8;
-  color: #606266;
+.task-card__priority-value {
+  font-weight: 700;
 }
 
 .status-select {
   width: 100%;
-  margin-top: 16px;
+  margin-top: auto;
+  padding-top: 16px;
 }
 
 .task-pagination {
@@ -651,13 +567,6 @@ function handleCommand(command, task) {
 .page-btn.active {
   border-color: #409eff;
   color: #409eff;
-}
-
-.page-total {
-  margin-left: 6px;
-  font-size: 15px;
-  font-weight: 600;
-  color: #303133;
 }
 
 @media (max-width: 1200px) {

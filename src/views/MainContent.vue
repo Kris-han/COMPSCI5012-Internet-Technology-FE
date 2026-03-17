@@ -8,13 +8,14 @@ import Finished from './Finished.vue'
 const props = defineProps({
   activeKey: {
     type: String,
-    default: 'today',
+    default: 'dashboard',
   },
   activeProject: {
     type: String,
     default: '',
   },
 })
+const emit = defineEmits(['add-task'])
 
 const currentComponent = computed(() => {
   switch (props.activeKey) {
@@ -37,6 +38,7 @@ const currentComponent = computed(() => {
     <component
       :is="currentComponent"
       :active-project="activeProject"
+      @add-task="emit('add-task')"
     />
   </section>
 </template>

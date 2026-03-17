@@ -31,6 +31,7 @@ const onTaskCreated = () => {
       <MainContent
         :active-key="activeKey"
         :active-project="activeProject"
+        @add-task="showAdd = true"
       />
     </main>
 
