@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // 建议：Vite 用 import.meta.env 读取环境变量
 const http = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:800/',
   timeout: 10000,
   withCredentials: false,
 })
