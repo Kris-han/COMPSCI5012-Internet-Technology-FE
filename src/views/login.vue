@@ -4,7 +4,7 @@
       <div class="auth-left">
         <div class="brand-block">
           <div class="brand-logo">T</div>
-          <h1 class="brand-title">TaskFlow</h1>
+          <h1 class="brand-title">ToDo List</h1>
           <p class="brand-desc">
             Organize your tasks, manage your day, and stay focused on what matters most.
           </p>
@@ -52,8 +52,9 @@
             </el-form-item>
 
             <div class="form-options">
-              <el-checkbox v-model="form.remember">Remember me</el-checkbox>
-              <span class="link-text">Forgot password?</span>
+              <router-link class="link-text" to="/reset-password">
+                Forgot password?
+              </router-link>
             </div>
 
             <el-button
@@ -266,14 +267,18 @@ async function handleLogin() {
   margin-top: 4px;
   margin-bottom: 22px;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
 }
 
 .link-text {
   color: #1d4ed8;
   cursor: pointer;
   font-size: 14px;
+  text-decoration: none;
+}
+
+.link-text:hover {
+  text-decoration: underline;
 }
 
 .submit-btn {

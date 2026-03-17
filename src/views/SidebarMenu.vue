@@ -2,11 +2,11 @@
   <aside class="sidebar" :class="{ 'is-collapsed': collapsed }">
     <!-- Header -->
     <div class="sidebar_header">
-      <el-avatar :size="28">韩</el-avatar>
+      <el-avatar :size="28">{{ avatarText }}</el-avatar>
 
       <div v-if="!collapsed" class="sidebar_title">
-        <div class="sidebar_name">chris</div>
-        <div class="sidebar_sub">个人工作区</div>
+        <div class="sidebar_name">{{ displayName }}</div>
+        <div class="sidebar_sub">Personal Workspace</div>
       </div>
 
       <div class="sidebar_actions">
@@ -102,6 +102,7 @@ import {
   Fold,
   Expand,
 } from "@element-plus/icons-vue"
+import { computed } from 'vue'
 
 const props = defineProps<{
   activeKey: string
@@ -110,7 +111,17 @@ const props = defineProps<{
   todayCount?: number
   searchKeyword?: string
 }>()
+const rawUserInfo = localStorage.getItem('taskflow_user_info')
+const userInfo = rawUserInfo ? JSON.parse(rawUserInfo) : {}
 
+const displayName = computed(() => {
+  return userInfo.username || 'User'
+})
+
+const avatarText = computed(() => {
+  const name = userInfo.username || ''
+  return name ? name.charAt(0).toUpperCase() : '?'
+})
 const emit = defineEmits<{
   (e: "update:activeKey", v: string): void
   (e: "update:collapsed", v: boolean): void
