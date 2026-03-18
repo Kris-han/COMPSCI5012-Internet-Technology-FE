@@ -481,7 +481,7 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 18px;
-  min-height: 520px;
+  min-height: 800px;
 }
 
 .task-card {
