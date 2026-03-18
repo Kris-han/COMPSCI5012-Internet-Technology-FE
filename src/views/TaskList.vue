@@ -18,6 +18,7 @@ const total = ref(0)
 const tasks = ref([])
 const props = defineProps<{
   searchKeyword?: string
+  taskListRefreshKey?: number
 }>()
 
 const emit = defineEmits<{
@@ -260,6 +261,12 @@ watch(
     loadTaskList()
   }
 )
+watch(
+  () => props.taskListRefreshKey,
+  () => {
+    loadTaskList()
+  }
+)
 onMounted(() => {
   loadTaskList()
 })
@@ -481,7 +488,7 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 18px;
-  min-height: 800px;
+  min-height: 580px;
 }
 
 .task-card {

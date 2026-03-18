@@ -26,6 +26,10 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
+  taskListRefreshKey: {
+    type: Number,
+    default: 0,
+  },
 })
 const emit = defineEmits(['add-task', 'update:searchKeyword', 'go-task-list', 'open-task-detail','update:todayCount',])
 
@@ -53,6 +57,7 @@ const currentComponent = computed(() => {
       :search-keyword="searchKeyword"
       :today-refresh-key="todayRefreshKey"
       :dashboard-refresh-key="dashboardRefreshKey"
+      :task-list-refresh-key="taskListRefreshKey"
       @update:searchKeyword="emit('update:searchKeyword', $event)"
       @update:todayCount="emit('update:todayCount', $event)"
       @go-task-list="emit('go-task-list')"

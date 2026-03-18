@@ -18,6 +18,7 @@ const todayCount = ref(0)
 const searchKeyword = ref('')
 const todayRefreshKey = ref(0)
 const dashboardRefreshKey = ref(0)
+const taskListRefreshKey = ref(0)
 async function handleLogout() {
   try {
     await logout({})
@@ -48,6 +49,7 @@ const handleTaskUpdated = async () => {
   currentTask.value = null
   todayRefreshKey.value += 1
   dashboardRefreshKey.value += 1
+  taskListRefreshKey.value += 1
   await loadTodayCount()
 }
 
@@ -55,6 +57,7 @@ const onTaskCreated = async () => {
   showAdd.value = false
   todayRefreshKey.value += 1
   dashboardRefreshKey.value += 1
+  taskListRefreshKey.value += 1
   await loadTodayCount()
 }
 function handleSearch(value: string) {
@@ -89,6 +92,7 @@ onMounted(() => {
         :search-keyword="searchKeyword"
         :today-refresh-key="todayRefreshKey"
         :dashboard-refresh-key="dashboardRefreshKey"
+        :task-list-refresh-key="taskListRefreshKey"
         @update:searchKeyword="searchKeyword = $event"
         @update:todayCount="todayCount = $event"
         @go-task-list="activeKey = 'taskList'"
