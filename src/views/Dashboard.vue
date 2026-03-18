@@ -2,6 +2,8 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { fetchDashboardData } from '@/api/dashboard'
+import ThirdPartyCard from '@/views/ThirdPartyCard.vue'
+
 
 const loading = ref(false)
 const props = defineProps({
@@ -146,6 +148,8 @@ onMounted(() => {
           <div class="summary-card__value">{{ item.value }}</div>
         </div>
       </section>
+
+      <ThirdPartyCard />
 
       <section class="chart-panel">
         <div class="panel-title">Task Count</div>
