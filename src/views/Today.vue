@@ -69,7 +69,7 @@
             <div>
               <h3>{{ focusTask.title }}</h3>
               <p class="project-text">
-                {{ focusTask.project_name || `Project ${focusTask.project_id || ''}` }}
+                {{ focusTask.project_name || `Project ${focusTask.project_name || ''}` }}
               </p>
             </div>
             <span class="status-tag" :class="getStatusClass(Number(focusTask.status))">
@@ -430,7 +430,7 @@ const displayTodayTasks = computed(() => {
     priorityDotClass: getPriorityDotClass(Number(task.priority)),
     statusText: getStatusText(Number(task.status)),
     statusClass: getStatusClass(Number(task.status)),
-    projectText: task.project_name || `Project ${task.project_id || ''}`,
+    projectText: task.project_name || `Project ${task.project_name || ''}`,
   }))
 })
 const filteredTodayTasks = computed(() => {

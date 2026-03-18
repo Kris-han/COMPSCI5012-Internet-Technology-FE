@@ -28,7 +28,7 @@ const form = reactive({
   title: '',
   description: '',
   priority: 2,
-  project_id: '',
+  project_name: '',
   start_time: '',
   end_time: '',
 })
@@ -76,7 +76,7 @@ watch(
       form.description = taskData.description || ''
       form.priority = taskData.priority ?? 2
       form.status = taskData.status ?? 1
-      form.project_id = taskData.project_id ?? ''
+      form.project_name = taskData.project_name ?? ''
       form.start_time = taskData.start_time_ts
         ? tsToDateTimeLocal(taskData.start_time_ts)
         : ''
@@ -98,7 +98,7 @@ function resetForm() {
   form.description = ''
   form.priority = 2
   form.status = 1
-  form.project_id = ''
+  form.project_name = ''
   form.start_time = ''
   form.end_time = ''
 
@@ -147,7 +147,7 @@ async function handleConfirm() {
         description: form.description.trim(),
         status: form.status,
         priority: form.priority,
-        project_id: form.project_id === '' ? null : Number(form.project_id),
+        project_name: form.project_name === '' ? null : Number(form.project_name),
         start_time_ts: startTimeTs,
         end_time_ts: endTimeTs,
       }
@@ -245,9 +245,9 @@ async function handleConfirm() {
         </el-select>
       </el-form-item>
 
-      <el-form-item label="Project ID">
+      <el-form-item label="Project Name">
         <el-input
-          v-model="form.project_id"
+          v-model="form.project_name"
           placeholder="Optional"
         />
       </el-form-item>

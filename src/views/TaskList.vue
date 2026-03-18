@@ -40,7 +40,7 @@ const form = reactive({
   priority: 2,
   start_time: '',
   end_time: '',
-  project_id: '',
+  project_name: '',
 })
 
 function resetForm() {
@@ -50,7 +50,7 @@ function resetForm() {
   form.priority = 2
   form.start_time = ''
   form.end_time = ''
-  form.project_id = ''
+  form.project_name = ''
 }
 function tsToDateTimeLocal(ts) {
   if (!ts) return ''
@@ -217,7 +217,7 @@ async function openEditDialog(task) {
     form.priority = detail.priority ?? 2
     form.start_time = tsToDateTimeLocal(detail.start_time_ts)
     form.end_time = tsToDateTimeLocal(detail.end_time_ts)
-    form.project_id = detail.project_id ?? ''
+    form.project_name = detail.project_name ?? ''
 
     dialogVisible.value = true
   } catch (error) {
@@ -234,7 +234,7 @@ async function handleSubmit() {
       priority: form.priority,
       start_time_ts: dateTimeLocalToTs(form.start_time),
       end_time_ts: dateTimeLocalToTs(form.end_time),
-      project_id: form.project_id ? Number(form.project_id) : null,
+      project_name: form.project_name ? Number(form.project_name) : null,
     }
 
     if (dialogMode.value === 'add') {
@@ -435,8 +435,8 @@ onMounted(() => {
       />
     </el-form-item>
 
-    <el-form-item label="Project ID">
-      <el-input v-model="form.project_id" />
+    <el-form-item label="Project Name">
+      <el-input v-model="form.project_name" />
     </el-form-item>
   </el-form>
 
