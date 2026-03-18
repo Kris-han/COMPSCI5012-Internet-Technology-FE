@@ -51,7 +51,7 @@
       @select="onSelect"
     >
       <el-menu-item index="dashboard">
-        <el-icon><Message /></el-icon>
+        <el-icon><Grid /></el-icon>
         <span v-if="!collapsed" class="menu_text">Dashboard</span>
       </el-menu-item>
 
@@ -91,7 +91,7 @@ import {
   Search,
   Bell,
   MoreFilled,
-  Message,
+  Grid,
   Calendar,
   Clock,
   CircleCheck,
