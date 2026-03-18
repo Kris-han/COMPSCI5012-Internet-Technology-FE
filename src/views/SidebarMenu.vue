@@ -59,14 +59,13 @@
         <el-icon><Calendar /></el-icon>
         <span v-if="!collapsed" class="menu_text">Today</span>
 
-        <!-- Badge：用一个容器固定在右侧，并且垂直居中 -->
         <span v-if="!collapsed" class="menu_right">
           <el-badge :value="todayCount" class="sidebar_badge" />
         </span>
       </el-menu-item>
 
       <el-menu-item index="taskList">
-        <el-icon><Clock /></el-icon>
+        <el-icon><List /></el-icon>
         <span v-if="!collapsed" class="menu_text">TaskList</span>
       </el-menu-item>
 
@@ -99,6 +98,7 @@ import {
   SwitchButton,
   Fold,
   Expand,
+  List,
 } from "@element-plus/icons-vue"
 import { computed } from 'vue'
 
