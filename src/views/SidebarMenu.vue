@@ -10,8 +10,6 @@
       </div>
 
       <div class="sidebar_actions">
-        <el-button circle size="small" :icon="Bell" aria-label="Notifications" />
-        <el-button circle size="small" :icon="MoreFilled" aria-label="More options" />
         <el-button
           circle
           size="small"
