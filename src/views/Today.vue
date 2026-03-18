@@ -2,7 +2,7 @@
   <div class="today-page">
     <div class="today-header">
       <div class="today-header-left">
-        <p class="today-greeting">Good morning, Chris</p>
+        <p class="today-greeting">Good morning, {{displayName}}</p>
         <h1 class="page-title">Today</h1>
         <p class="page-subtitle">
           You have <strong>{{ totalCount }}</strong> tasks today, including
@@ -223,6 +223,14 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
+})
+
+
+const rawUserInfo = localStorage.getItem('taskflow_user_info')
+const userInfo = rawUserInfo ? JSON.parse(rawUserInfo) : {}
+
+const displayName = computed(() => {
+  return userInfo.username || 'User'
 })
 const activeFilter = ref('all')
 const loading = ref(false)
