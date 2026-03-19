@@ -6,7 +6,7 @@ import {
   ArrowRight,
 } from '@element-plus/icons-vue'
 import {ref, computed, onMounted, watch, reactive} from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { fetchTaskList } from '@/api/task_list'
 import { addTask, updateTask, getTask, deleteTask,searchTask } from '@/api/task'
 
@@ -14,6 +14,9 @@ const loading = ref(false)
 const currentPage = ref(1)
 const pageSize = ref(12)
 const total = ref(0)
+
+const deleteDialogVisible = ref(false)
+const deletingTask = ref<any>(null)
 
 const tasks = ref([])
 const props = defineProps<{
@@ -43,6 +46,40 @@ const form = reactive({
   end_time: '',
   project_name: '',
 })
+
+function openDeleteDialog(task) {
+  deletingTask.value = task
+  deleteDialogVisible.value = true
+}
+
+async function confirmDeleteTask() {
+  if (!deletingTask.value?.id) return
+
+  try {
+    await deleteTask(deletingTask.value.id)
+
+    ElMessage({
+      message: 'Task deleted successfully',
+      type: 'success',
+    })
+
+    deleteDialogVisible.value = false
+    deletingTask.value = null
+
+    // 如果删完当前页没数据了，可以回退一页
+    if (tasks.value.length === 1 && currentPage.value > 1) {
+      currentPage.value -= 1
+    }
+
+    await loadTaskList()
+  } catch (error) {
+    ElMessage({
+      message: 'Failed to delete task',
+      type: 'error',
+    })
+    console.error('Failed to delete task:', error)
+  }
+}
 
 function resetForm() {
   form.title = ''
@@ -177,29 +214,7 @@ async function handleCommand(command, task) {
   }
 
   if (command === 'delete') {
-    try {
-      await ElMessageBox.confirm(
-        `Are you sure you want to delete "${task.name}"?`,
-        'Delete Task',
-        {
-          confirmButtonText: 'Delete',
-          cancelButtonText: 'Cancel',
-          type: 'warning',
-        }
-      )
-
-      await deleteTask(task.id)
-
-      ElMessage({
-        message: 'Task deleted successfully',
-        type: 'success',
-      })
-
-      loadTaskList()
-    } catch (error) {
-      // 用户点击取消时，不提示失败
-      console.log('Delete cancelled or failed:', error)
-    }
+    openDeleteDialog(task)
   }
 }
 async function openEditDialog(task) {
@@ -390,10 +405,10 @@ onMounted(() => {
     </div>
   </div>
   <el-dialog
-  v-model="dialogVisible"
-  :title="dialogMode === 'add' ? 'Add Task' : 'Edit Task'"
-  width="600px"
->
+      v-model="dialogVisible"
+      :title="dialogMode === 'add' ? 'Add Task' : 'Edit Task'"
+      width="600px"
+    >
   <el-form :model="form" label-width="120px">
     <el-form-item label="Title">
       <el-input v-model="form.title" />
@@ -454,6 +469,23 @@ onMounted(() => {
     </el-button>
   </template>
 </el-dialog>
+
+  <el-dialog
+    v-model="deleteDialogVisible"
+    title="Delete Task"
+    width="420px"
+    align-center
+  >
+    <div>
+      Are you sure you want to delete
+      <strong>"{{ deletingTask?.name || deletingTask?.title }}"</strong>?
+    </div>
+
+    <template #footer>
+      <el-button @click="deleteDialogVisible = false">Cancel</el-button>
+      <el-button type="danger" @click="confirmDeleteTask">Delete</el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <style scoped>
